@@ -17,9 +17,14 @@ public class PickUpNew : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        Collect();
+	void FixedUpdate()
+	{
+		Collect();
+
+		//calculate velocity of held object each engine update
+		//TODO add max speed to thrown objects
+		objectVelocity = (onhand.position - locale) / Time.deltaTime;
+		locale = onhand.position;
 
         //if isholding and child 0 tag = canpickup
         //set child 0 transform to onhand.position
@@ -29,10 +34,6 @@ public class PickUpNew : MonoBehaviour {
             gameObject.transform.GetChild(0).rotation = onhand.parent.parent.rotation;
 
         }
-        //trying to figure out how to give the held object momentum when dropped
-        //i.e. give it the parent's velocity instead of just setting them to zero
-        //Debug.Log(gameObject.transform.parent.gameObject.GetComponent<Rigidbody>().velocity);
-        //Debug.Log(gameObject.transform.parent.gameObject.name);
     }
 
     void Collect()
@@ -79,13 +80,9 @@ public class PickUpNew : MonoBehaviour {
             Transform hitObject_transform = gameObject.transform.GetChild(0);
 
 
-            //Rigidbody hitObject_rb = hitObject_transform.gameObject.GetComponent<Rigidbody>();
-            //hitObject_rb.isKinematic = false;
 
-            // Debug.Log(hitObject_rb.name);
-            //  Debug.Log(hitObject_rb.isKinematic);
 
-            hitObject_transform.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            hitObject_transform.gameObject.GetComponent<Rigidbody>().velocity = velocity;
             hitObject_transform.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
             hitObject_transform.gameObject.GetComponent<Rigidbody>().useGravity = true;
 
