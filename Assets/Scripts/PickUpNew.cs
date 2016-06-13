@@ -25,6 +25,16 @@ public class PickUpNew : MonoBehaviour {
         objectVelocity = (onhand.position - locale) / Time.deltaTime;
         locale = onhand.position;
 
+        //if isholding and child 0 tag = canpickup
+        //set child 0 transform to onhand.position
+        if (IsHolding && gameObject.transform.GetChild(0).gameObject.tag == "CanPickUp")
+        {
+
+            gameObject.transform.GetChild(0).position = onhand.position;
+            gameObject.transform.GetChild(0).rotation = onhand.parent.parent.rotation;
+
+        }
+
     }
     //splitting the step into the different update types fixed the "input not registering" issue, not sure why
 
@@ -33,15 +43,7 @@ public class PickUpNew : MonoBehaviour {
 	{
 		Collect();
         
-        //if isholding and child 0 tag = canpickup
-        //set child 0 transform to onhand.position
-        if(IsHolding && gameObject.transform.GetChild(0).gameObject.tag == "CanPickUp")
-        {
-            
-            gameObject.transform.GetChild(0).position = onhand.position;
-            gameObject.transform.GetChild(0).rotation = onhand.parent.parent.rotation;
-
-        }
+        
     }
 
     void Collect()
