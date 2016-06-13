@@ -8,6 +8,7 @@ public class LightToggle : MonoBehaviour {
 
     public int distanceToItem;
     public GameObject player;
+    public float Light_Intensity;
 
     bool IsActive = true;
 
@@ -26,7 +27,7 @@ public class LightToggle : MonoBehaviour {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             //see if there's a toggleable light in front of the player, and toggle it
-            if (Physics.Raycast(ray, out hit, distanceToItem))
+            if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject==gameObject)
             {
                 if (hit.collider.gameObject.tag == "ToggleableLight")
                 {
@@ -41,10 +42,16 @@ public class LightToggle : MonoBehaviour {
     //Add a script to update to change the IsActive value based on the intensity of the light
     //in other words, update the bool value to reflect the true status of the light
     //added flexibility and all that
+    //add it to its own function so that update doesnt get bloated
+    
+    //TODO
+    // instead of GetChild(0) to get the first child
+    //get a list of all the children and toggle all of them
+    //to allow for a single switch to control multiple lights
     
     void Toggle_Light()
     {
-        Debug.Log("Toggling Light");
+        
         GameObject light_source = gameObject.transform.GetChild(0).gameObject;
         if (IsActive)
         {
@@ -55,7 +62,7 @@ public class LightToggle : MonoBehaviour {
         else
         {
             //turn the light on if its off
-            light_source.GetComponent<Light>().intensity = 1;
+            light_source.GetComponent<Light>().intensity = Light_Intensity;
             IsActive = true;
         }
     }
