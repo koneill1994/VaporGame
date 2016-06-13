@@ -7,13 +7,15 @@ public class PickUpNew : MonoBehaviour {
     public GameObject player;
 
     public Transform onhand;
+    public Vector3 locale;
+    Vector3 objectVelocity;
 
     bool IsHolding = false;
 
     // Use this for initialization
     void Start()
     {
-
+        locale = onhand.position;
     }
 
     // Update is called once per frame
@@ -69,10 +71,10 @@ public class PickUpNew : MonoBehaviour {
         }
         
         //FIXME objects can be placed below the map and be lost
-          //consequence of turning on kinematic
-          //fix: keep kinematic off & implement vvv
-        //TODO hover objects in front of camera
-
+          
+        //FIXME fixedupdate causes jitter, and sometimes makes input nonresponsive
+        
+        //TODO add angular velocity to object in same way (make it look more realistic)
 
         else if (Input.GetButtonUp("Use") && IsHolding) // This will release the object 
         {
@@ -82,7 +84,7 @@ public class PickUpNew : MonoBehaviour {
 
 
 
-            hitObject_transform.gameObject.GetComponent<Rigidbody>().velocity = velocity;
+            hitObject_transform.gameObject.GetComponent<Rigidbody>().velocity = objectVelocity;
             hitObject_transform.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
             hitObject_transform.gameObject.GetComponent<Rigidbody>().useGravity = true;
 
