@@ -29,9 +29,10 @@ public class PickUpNew : MonoBehaviour {
             gameObject.transform.GetChild(0).rotation = onhand.parent.parent.rotation;
 
         }
-
-
-
+        //trying to figure out how to give the held object momentum when dropped
+        //i.e. give it the parent's velocity instead of just setting them to zero
+        //Debug.Log(gameObject.transform.parent.gameObject.GetComponent<Rigidbody>().velocity);
+        //Debug.Log(gameObject.transform.parent.gameObject.name);
     }
 
     void Collect()
