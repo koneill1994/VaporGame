@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(CharacterController))]
 public class BehaviorWhenUnseen : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    public float speed = 3.0F;
+
+    // Use this for initialization
+    void Start () {
 	
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+        CharacterController controller = GetComponent<CharacterController>();
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+
         if (gameObject.GetComponent<Renderer>().isVisible)
         {
             //Debug.Log("IS VISIBLE");
@@ -29,6 +36,10 @@ public class BehaviorWhenUnseen : MonoBehaviour {
                 Vector3 eulerAngles = transform.rotation.eulerAngles;
                 eulerAngles = new Vector3(0, eulerAngles.y, 0);
                 transform.rotation = Quaternion.Euler(eulerAngles);
+
+                //this is the code to make it follow you
+
+                controller.SimpleMove(forward * speed);
 
             }
         }
