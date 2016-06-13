@@ -12,7 +12,7 @@ public class BehaviorWhenUnseen : MonoBehaviour {
 	void Update () {
         if (gameObject.GetComponent<Renderer>().isVisible)
         {
-            Debug.Log("IS VISIBLE");
+            //Debug.Log("IS VISIBLE");
         }
         else
         {
@@ -20,7 +20,7 @@ public class BehaviorWhenUnseen : MonoBehaviour {
             if (main_cam.Length==1)
             {
                 Vector3 targetDir = main_cam[0].transform.position - transform.position;
-                Debug.Log("NOT VISIBLE");
+                //Debug.Log("NOT VISIBLE");
                 Vector3 newDir = Vector3.RotateTowards(gameObject.transform.forward, targetDir, 4.0f, 0.0f);
                 transform.rotation = Quaternion.LookRotation(newDir);
 
