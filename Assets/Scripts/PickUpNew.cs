@@ -5,7 +5,7 @@ public class PickUpNew : MonoBehaviour {
 
     public int distanceToItem;
     public GameObject player;
-
+	public GameObject hitObject;
     public Transform onhand;
     public Vector3 locale;
     Vector3 objectVelocity;
@@ -25,15 +25,15 @@ public class PickUpNew : MonoBehaviour {
         objectVelocity = (onhand.position - locale) / Time.deltaTime;
         locale = onhand.position;
 
-        //if isholding and child 0 tag = canpickup
-        //set child 0 transform to onhand.position
-        if (IsHolding && gameObject.transform.GetChild(0).gameObject.tag == "CanPickUp")
-        {
-
-            gameObject.transform.GetChild(0).position = onhand.position;
-            gameObject.transform.GetChild(0).rotation = onhand.parent.parent.rotation;
-
-        }
+		//if isholding and child 0 tag = canpickup
+		//set child 0 transform to onhand.position
+		if (IsHolding)
+		{
+			hitObject.GetComponent<Rigidbody>().AddForce((onhand.position-hitObject.transform.position)*300);
+			hitObject.GetComponent<Rigidbody>().rotation = onhand.rotation;
+			hitObject.GetComponent<Rigidbody>().drag = 15;
+			hitObject.GetComponent<Rigidbody>().angularDrag = 15;
+		}
 
     }
     //splitting the step into the different update types fixed the "input not registering" issue, not sure why
@@ -41,43 +41,26 @@ public class PickUpNew : MonoBehaviour {
     // Update is called once per frame
     void Update()
 	{
-		Collect();
-        
-        
-    }
-
-    void Collect()
-    {
-
 
         if (Input.GetButtonUp("Use") && !IsHolding)
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            
-
             if (Physics.Raycast(ray, out hit, distanceToItem))
             {
                 if (hit.collider.gameObject.tag == "CanPickUp")
                 {
+					hitObject = hit.collider.gameObject;
+					Debug.Log(hitObject.tag);
+
                     IsHolding = true;
-                    
-
-                    GameObject hitObject = hit.collider.gameObject;
-                    hitObject.transform.parent = gameObject.transform;
-                    hitObject.transform.SetAsFirstSibling();
-
-                    hitObject.GetComponent<Rigidbody>().useGravity = false;
-                    hitObject.transform.position = onhand.position;
-
                 }
 
             }
-
-
+		
         }
-        
+
         //FIXME objects can be placed below the map and be lost
                         
         //TODO add angular velocity to object in same way (make it look more realistic)
@@ -85,23 +68,9 @@ public class PickUpNew : MonoBehaviour {
         else if (Input.GetButtonUp("Use") && IsHolding) // This will release the object 
         {
             IsHolding = false;
-            Transform hitObject_transform = gameObject.transform.GetChild(0);
-
-
-
-            //Debug.Log(objectVelocity);
-            hitObject_transform.gameObject.GetComponent<Rigidbody>().velocity = objectVelocity;
-            hitObject_transform.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-            hitObject_transform.gameObject.GetComponent<Rigidbody>().useGravity = true;
-
-            hitObject_transform.transform.parent = null;
-            hitObject_transform = null;
-
-            
-            
+			hitObject.GetComponent<Rigidbody>().drag = .5f;
+			hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
         }
-
-
 
     }
 }
