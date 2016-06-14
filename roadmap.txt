@@ -1,0 +1,14 @@
+* script to allow for picking up of physics objects (source-engine style) -- largely done
+* script to allow for interacting with in-world buttons (which will then need scripts to determine what they do) -- done - see toggleablelight
+* model an environment/building to explore in blender -- needs attention
+* game design/writing/themes -- needs work (hard to write new features without a goal in mind)
+
+Game idea:
+
+A vaporwave themed puzzle/horror game, with minimal plot beyond the experience itself, designed to somewhat emulate the barrenness of environments found in early computer graphics (example: myst)
+
+focus on exploration, and doesnt force the player to play at any particular pace
+
+i think the spooky statuetka is pretty neato
+* weeping angel mechanics, but is much freakier as an abstract statue
+  - where the horror element might come in
