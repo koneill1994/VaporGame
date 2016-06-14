@@ -29,8 +29,10 @@ public class PickUpNew : MonoBehaviour {
 		//set child 0 transform to onhand.position
 		if (IsHolding)
 		{
-			hitObject.GetComponent<Rigidbody>().AddForce((onhand.position-hitObject.transform.position)*100);
-			//TODO motion dampening
+			hitObject.GetComponent<Rigidbody>().AddForce((onhand.position-hitObject.transform.position)*300);
+			hitObject.GetComponent<Rigidbody>().rotation = onhand.rotation;
+			hitObject.GetComponent<Rigidbody>().drag = 15;
+			hitObject.GetComponent<Rigidbody>().angularDrag = 15;
 		}
 
     }
@@ -66,6 +68,8 @@ public class PickUpNew : MonoBehaviour {
         else if (Input.GetButtonUp("Use") && IsHolding) // This will release the object 
         {
             IsHolding = false;
+			hitObject.GetComponent<Rigidbody>().drag = .5f;
+			hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
         }
 
     }
