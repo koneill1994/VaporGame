@@ -10,6 +10,8 @@ public class PickUpNew : MonoBehaviour {
     public Vector3 locale;
     Vector3 objectVelocity;
 
+    public float ThrowForce;
+
     bool IsHolding = false;
 
     // Use this for initialization
@@ -24,9 +26,7 @@ public class PickUpNew : MonoBehaviour {
         //TODO add max speed to thrown objects
         objectVelocity = (onhand.position - locale) / Time.deltaTime;
         locale = onhand.position;
-
-		//if isholding and child 0 tag = canpickup
-		//set child 0 transform to onhand.position
+        
 		if (IsHolding)
 		{
 			hitObject.GetComponent<Rigidbody>().AddForce((onhand.position-hitObject.transform.position)*300);
@@ -65,11 +65,27 @@ public class PickUpNew : MonoBehaviour {
                         
         //TODO add angular velocity to object in same way (make it look more realistic)
 
+        //TODO drop the cube if it gets too far away (so if it gets stuck behind a fence and you walk a mile away, it wont shoot towards you when you jump
+
+        //you can climb up vertical walls by holding a cube under you, against the wall, jumping on it, and pulling upwards
+        //TODO figure out a way to disable that?
+
         else if (Input.GetButtonUp("Use") && IsHolding) // This will release the object 
         {
             IsHolding = false;
 			hitObject.GetComponent<Rigidbody>().drag = .5f;
 			hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
+        }
+
+        if (Input.GetButtonUp("Fire1") && IsHolding) // This will release the object 
+        {
+            Debug.Log("Throw");
+            IsHolding = false;
+            hitObject.GetComponent<Rigidbody>().drag = .5f;
+            hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
+
+            hitObject.GetComponent<Rigidbody>().AddForce(onhand.forward * ThrowForce);
+
         }
 
     }
