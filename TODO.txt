@@ -1,3 +1,0 @@
-* script to allow for picking up of physics objects (source-engine style)
-* script to allow for interacting with in-world buttons (which will then need scripts to determine what they do)
-* model an environment/building to explore in blender
