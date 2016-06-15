@@ -7,6 +7,7 @@ public class ChasePlayer : MonoBehaviour
     public GameObject player;
     private NavMeshAgent agent;
     private float base_speed;
+    public bool OnlyMoveWhenUnseen;
 
     void Start()
     {
@@ -17,8 +18,8 @@ public class ChasePlayer : MonoBehaviour
     void Update()
     {
         agent.destination = player.transform.position;
-
-        if (gameObject.GetComponent<Renderer>().isVisible)
+        
+        if (gameObject.GetComponent<Renderer>().isVisible && OnlyMoveWhenUnseen)
         {
             //Debug.Log("IS VISIBLE");
             agent.speed = 0.0f;
