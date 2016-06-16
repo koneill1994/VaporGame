@@ -52,7 +52,7 @@ public class PickUpNew : MonoBehaviour {
                 if (hit.collider.gameObject.tag == "CanPickUp")
                 {
 					hitObject = hit.collider.gameObject;
-					Debug.Log(hitObject.tag);
+					//Debug.Log(hitObject.tag);
 
                     IsHolding = true;
                 }
@@ -79,7 +79,7 @@ public class PickUpNew : MonoBehaviour {
 
         if (Input.GetButtonUp("Fire1") && IsHolding) // This will release the object 
         {
-            Debug.Log("Throw");
+            //Debug.Log("Throw");
             IsHolding = false;
             hitObject.GetComponent<Rigidbody>().drag = .5f;
             hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
