@@ -26,3 +26,6 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+player_win_x86.pdb
+player_win_x86_s.pdb
