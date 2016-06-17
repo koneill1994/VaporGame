@@ -3,27 +3,46 @@ using System.Collections;
 
 public class CubeStackingAIBehavior : MonoBehaviour {
 
-    public enum StackerGoal {PickTargetObject, PathToObject, PathToPile}
+    public enum StackerGoal {PickTargetObject, PathToObject, PathToPile, FreezeWhenSeen}
     public StackerGoal CurrentGoal;
     public GameObject Goal_Object;
     public Transform onhand;
     public Transform pile;
-
+    public bool OnlyMoveWhenUnseen = false;
+    
     public float PickUpRange = 10;
     public float pile_size = 10;
 
     private NavMeshAgent agent;
     private bool IsHolding = false;
+    private float base_speed;
 
     // Use this for initialization
     void Start () {
         CurrentGoal = StackerGoal.PickTargetObject;
-
         agent = GetComponent<NavMeshAgent>();
+        base_speed = agent.speed;
     }
 	
 	// Update is called once per frame
 	void Update () {
+        //Debug.Log(agent.speed);
+        
+        if (gameObject.GetComponent<Renderer>().isVisible && OnlyMoveWhenUnseen)
+        {
+            //Debug.Log("IS VISIBLE");
+            agent.speed = 0.0f;
+            agent.velocity = Vector3.zero;
+            CurrentGoal = StackerGoal.FreezeWhenSeen;
+            agent.destination = pile.position;
+        }
+        else
+        {
+            //NOT VISIBLE
+            agent.speed = base_speed;
+        }
+        
+
         if (CurrentGoal == StackerGoal.PickTargetObject)
         {
             //chooses the closest game object to the agent
@@ -63,11 +82,21 @@ public class CubeStackingAIBehavior : MonoBehaviour {
             if (offset.magnitude < PickUpRange)
             {
                 IsHolding = false;
+                Goal_Object.GetComponent<Rigidbody>().drag = .5f;
+                Goal_Object.GetComponent<Rigidbody>().angularDrag = .05f;
                 CurrentGoal = StackerGoal.PickTargetObject;
                 //Goal_Object.tag = "InPile";
             }
         }
-
+        else if (CurrentGoal == StackerGoal.FreezeWhenSeen)
+        {
+            Vector3 offset = transform.position - pile.position;
+            if (offset.magnitude < PickUpRange)
+            {
+                CurrentGoal = StackerGoal.PickTargetObject;
+                //Goal_Object.tag = "InPile";
+            }
+        }
 
 
 
