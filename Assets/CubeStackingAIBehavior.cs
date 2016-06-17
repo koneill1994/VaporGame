@@ -75,7 +75,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
     //THINGS TO ADD
     // behavior to freeze, go invisible, chase player when unseen (i.e. weeping angel style) if player  gets too close
-    // more robustpile system, picking up objects
+    // more robust pile system, picking up objects
     // ability to wander around randomly, searching for cubes, & only path to them & bring them back if they are discovered while searching
     //more or less stringent "pile coherence" standards based on number of cubes in pile & number in "bring to pile" queue
     //ignore light cubes, or ability to extinguish them when adding them to a pile ( to prevent lighting glitches from concentrating light sources in one room)
