@@ -8,7 +8,7 @@ public class PickUpNew : MonoBehaviour {
 	public GameObject hitObject;
     public Transform onhand;
     public Vector3 locale;
-    Vector3 objectVelocity;
+    public Vector3 objectVelocity;
 
     public float ThrowForce;
 
