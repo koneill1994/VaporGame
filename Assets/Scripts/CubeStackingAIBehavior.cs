@@ -9,6 +9,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     public Transform onhand;
     public Transform pile;
     public bool OnlyMoveWhenUnseen = false;
+    public bool RecalcTargetDistsEveryFrame = false;
     
     public float PickUpRange = 10;
     public float pile_size = 10;
@@ -46,13 +47,18 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         if (CurrentGoal == StackerGoal.PickTargetObject)
         {
             //chooses the closest game object to the agent
-            Goal_Object = GetClosestObject(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
+            Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
             //TODO only choose an object if it can be pathed to
             CurrentGoal = StackerGoal.PathToObject;
         }
 
         else if (CurrentGoal == StackerGoal.PathToObject)
         {
+            if(RecalcTargetDistsEveryFrame)
+                Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
+            //THIS IS COSTLY (framrate drop when active)
+            //figure out a better method
+
             agent.destination = Goal_Object.transform.position;
             Vector3 offset = transform.position - Goal_Object.transform.position;
             if (offset.magnitude < PickUpRange)
@@ -99,8 +105,11 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         }
 
 
-
+        for (int i = 0; i < agent.path.corners.Length - 1; i++)
+        {
+            Debug.DrawLine(agent.path.corners[i], agent.path.corners[i + 1]);
         }
+    }
 
     //THINGS TO ADD
     // behavior to freeze, go invisible, chase player when unseen (i.e. weeping angel style) if player  gets too close
@@ -136,4 +145,49 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     }
 
 
+
+    Transform GetClosestObjectViaPathing(GameObject[] objects)
+    {
+        Transform bestTarget = null;
+        float closestDistancePath = Mathf.Infinity;
+        NavMeshPath path = new NavMeshPath();
+        foreach (GameObject potential_target in objects)
+        {
+            if (NavMesh.CalculatePath(transform.position, potential_target.transform.position, NavMesh.AllAreas, path))
+            {
+                float PathDistanceToTarget = PathLength(path);
+                Vector3 offset = potential_target.transform.position - pile.position;
+                Debug.Log(potential_target.name);
+                Debug.Log(PathDistanceToTarget);
+                if (PathDistanceToTarget < closestDistancePath)
+                {
+                    if (offset.magnitude > pile_size)
+                    {
+                    bestTarget = potential_target.transform;
+                        closestDistancePath = PathDistanceToTarget;
+                    }
+                }
+            }
+        }
+        return bestTarget;
+    }
+
+
+    float PathLength(NavMeshPath path)
+    {
+        if (path.corners.Length < 2)
+            return 0;
+
+        Vector3 previousCorner = path.corners[0];
+        float lengthSoFar = 0.0F;
+        int i = 1;
+        while (i < path.corners.Length)
+        {
+            Vector3 currentCorner = path.corners[i];
+            lengthSoFar += Vector3.Distance(previousCorner, currentCorner);
+            previousCorner = currentCorner;
+            i++;
+        }
+        return lengthSoFar;
+    }
 }
