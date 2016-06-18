@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class CubeStackingAIBehavior : MonoBehaviour {
 
@@ -69,8 +70,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
         else if (CurrentGoal == StackerGoal.PathToObject)
         {
-            bool NearPile = VisionRange > (pile.position - transform.position).magnitude;
-            bool NearTarget = VisionRange > (Goal_Object.transform.position - transform.position).magnitude;
+            //sqrt is computationally costly, so sqrMagnitude
+            bool NearPile = Math.Pow(VisionRange,2) > (pile.position - transform.position).sqrMagnitude;
+            bool NearTarget = Math.Pow(VisionRange,2) > (Goal_Object.transform.position - transform.position).sqrMagnitude;
             if (ObjectWithinVisionDistance() && !NearPile && !NearTarget)
             {
                 Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
@@ -141,8 +143,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         //returns true if at least one object is within VisionRange of the agent
         foreach(GameObject pickup in GameObject.FindGameObjectsWithTag("CanPickUp"))
         {
-            float Distance = (pickup.transform.position - transform.position).magnitude;
-            if (Distance < VisionRange)
+            //sqrt is computationally costly, so sqrMagnitude
+            float SqrDistance = (pickup.transform.position - transform.position).sqrMagnitude;
+            if (SqrDistance < Math.Pow(VisionRange, 2))
             {
                 return true;
             }
