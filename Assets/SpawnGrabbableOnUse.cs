@@ -21,17 +21,10 @@ public class SpawnGrabbableOnUse : MonoBehaviour {
             //use button is pressed
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //see if there's a toggleable light in front of the player, and toggle it
             if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
             {
                 Instantiate(SpawnObject, transform.position + SpawnOffset, Quaternion.identity);
             }
         }
-    }
-
-
-    void Spawn_Item()
-    {
-        Debug.Log("Test");
     }
 }

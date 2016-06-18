@@ -43,8 +43,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
 
     // Update is called once per frame
-    void Update () {
-        //Debug.Log(agent.speed);        
+    void Update () {       
         if (gameObject.GetComponent<Renderer>().isVisible && OnlyMoveWhenUnseen)
         {
             //Debug.Log("IS VISIBLE");
@@ -105,8 +104,6 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         {
             if (IsHolding)
             {
-                //transform.TransformPoint(Vector3.right * 2)
-                //Goal_Object.GetComponent<Rigidbody>().AddForce((onhand.position - Goal_Object.transform.position) * 300);
                 Goal_Object.GetComponent<Rigidbody>().AddForce((transform.TransformPoint(Vector3.forward * CarryPositionOffset) - Goal_Object.transform.position) * 300);
                 Goal_Object.GetComponent<Rigidbody>().rotation = transform.rotation;
                 Goal_Object.GetComponent<Rigidbody>().drag = 15;
@@ -120,7 +117,6 @@ public class CubeStackingAIBehavior : MonoBehaviour {
                 Goal_Object.GetComponent<Rigidbody>().drag = .5f;
                 Goal_Object.GetComponent<Rigidbody>().angularDrag = .05f;
                 CurrentGoal = StackerGoal.PickTargetObject;
-                //Goal_Object.tag = "InPile";
             }
         }
         else if (CurrentGoal == StackerGoal.FreezeWhenSeen)
@@ -129,7 +125,6 @@ public class CubeStackingAIBehavior : MonoBehaviour {
             if (offset.magnitude < PickUpRange)
             {
                 CurrentGoal = StackerGoal.PickTargetObject;
-                //Goal_Object.tag = "InPile";
             }
         }
 
