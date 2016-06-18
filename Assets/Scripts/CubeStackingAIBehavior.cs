@@ -63,8 +63,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         if (CurrentGoal == StackerGoal.PickTargetObject)
         {
             //chooses the closest game object to the agent
-            Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
+            Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp"));
             //TODO only choose an object if it can be pathed to
+            if(Goal_Object != null)
             CurrentGoal = StackerGoal.PathToObject;
         }
 
@@ -75,7 +76,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
             bool NearTarget = Math.Pow(VisionRange,2) > (Goal_Object.transform.position - transform.position).sqrMagnitude;
             if (ObjectWithinVisionDistance() && !NearPile && !NearTarget)
             {
-                Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
+                Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp"));
                 //Debug.Log("SEARCHING FOR CLOSEST OBJECT");
                 Searching = true;
             }
@@ -160,12 +161,12 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     // ability to wander around randomly, searching for cubes, & only path to them & bring them back if they are discovered while searching
     //more or less stringent "pile coherence" standards based on number of cubes in pile & number in "bring to pile" queue
     //ignore light cubes, or ability to extinguish them when adding them to a pile ( to prevent lighting glitches from concentrating light sources in one room)
-        //player can re-ignite light cubes (or only have one lit at a time?)
+    //player can re-ignite light cubes (or only have one lit at a time?)
     //drop objects if they get too far away ?  (need to add to pickupnew as well)
-        //if so, a way to stop ai from getting stuck in a pick-up, drop loop?
+    //if so, a way to stop ai from getting stuck in a pick-up, drop loop?
 
-    
-    Transform GetClosestObject(GameObject[] objects)
+
+    GameObject GetClosestObject(GameObject[] objects)
     {
         //returns the object in the list with the shortest absolute distance from the current position
         //DEPRECATED (use GetClosestObjectViaPathing)
@@ -187,12 +188,12 @@ public class CubeStackingAIBehavior : MonoBehaviour {
                 }
             }
         }
-        return bestTarget;
+        return bestTarget.gameObject;
     }
 
 
 
-    Transform GetClosestObjectViaPathing(GameObject[] objects)
+    GameObject GetClosestObjectViaPathing(GameObject[] objects)
     {
         //returns the object in the list with the shortest path to reach
         //THIS IS COMPUTATIONALLY COSTLY (framrate drop when active)
@@ -206,8 +207,8 @@ public class CubeStackingAIBehavior : MonoBehaviour {
             {
                 float PathDistanceToTarget = PathLength(path);
                 Vector3 offset = potential_target.transform.position - pile.position;
-                Debug.Log(potential_target.name);
-                Debug.Log(PathDistanceToTarget);
+                //Debug.Log(potential_target.name);
+                //Debug.Log(PathDistanceToTarget);
                 if (PathDistanceToTarget < closestDistancePath)
                 {
                     if (offset.magnitude > pile_size)
@@ -218,7 +219,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
                 }
             }
         }
-        return bestTarget;
+        return bestTarget.gameObject;
     }
 
 
