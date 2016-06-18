@@ -11,12 +11,17 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     public bool OnlyMoveWhenUnseen = false;
     public bool RecalcTargetDistsEveryFrame = false;
     
-    public float PickUpRange = 10;
+    public float PickUpRange = 3;
     public float pile_size = 10;
+    public float VisionRange = 10;
 
     private NavMeshAgent agent;
     private bool IsHolding = false;
     private float base_speed;
+
+    public bool Searching=false;
+    public bool NearPile = false;
+    public bool NearTarget = false;
 
     // Use this for initialization
     void Start () {
@@ -24,11 +29,21 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         agent = GetComponent<NavMeshAgent>();
         base_speed = agent.speed;
     }
-	
-	// Update is called once per frame
-	void Update () {
-        //Debug.Log(agent.speed);
+
+    void OnDrawGizmos()
+    {
+        if (Searching)
+            Gizmos.color = Color.yellow;
+        else
+            Gizmos.color = Color.white;
         
+        Gizmos.DrawWireSphere(transform.position, VisionRange);
+    }
+
+
+    // Update is called once per frame
+    void Update () {
+        //Debug.Log(agent.speed);        
         if (gameObject.GetComponent<Renderer>().isVisible && OnlyMoveWhenUnseen)
         {
             //Debug.Log("IS VISIBLE");
@@ -54,10 +69,19 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
         else if (CurrentGoal == StackerGoal.PathToObject)
         {
-            if(RecalcTargetDistsEveryFrame)
+            bool NearPile = VisionRange > (pile.position - transform.position).magnitude;
+            bool NearTarget = VisionRange > (Goal_Object.transform.position - transform.position).magnitude;
+            if (ObjectWithinVisionDistance() && !NearPile && !NearTarget)
+            {
                 Goal_Object = GetClosestObjectViaPathing(GameObject.FindGameObjectsWithTag("CanPickUp")).gameObject;
-            //THIS IS COSTLY (framrate drop when active)
-            //figure out a better method
+                //Debug.Log("SEARCHING FOR CLOSEST OBJECT");
+                Searching = true;
+            }
+            else
+            {
+                //Debug.Log("nominal");
+                Searching = false;
+            }
 
             agent.destination = Goal_Object.transform.position;
             Vector3 offset = transform.position - Goal_Object.transform.position;
@@ -111,6 +135,22 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         }
     }
 
+
+    bool ObjectWithinVisionDistance()
+    {
+        //returns true if at least one object is within VisionRange of the agent
+        foreach(GameObject pickup in GameObject.FindGameObjectsWithTag("CanPickUp"))
+        {
+            float Distance = (pickup.transform.position - transform.position).magnitude;
+            if (Distance < VisionRange)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     //THINGS TO ADD
     // behavior to freeze, go invisible, chase player when unseen (i.e. weeping angel style) if player  gets too close
     // more robust pile system, picking up objects
@@ -124,6 +164,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     
     Transform GetClosestObject(GameObject[] objects)
     {
+        //returns the object in the list with the shortest absolute distance from the current position
+        //DEPRECATED (use GetClosestObjectViaPathing)
+        //leads to stupid AI behavior
         Transform bestTarget = null;
         float closestDistanceSqr = Mathf.Infinity;
         Vector3 currentPos = transform.position;
@@ -148,6 +191,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
     Transform GetClosestObjectViaPathing(GameObject[] objects)
     {
+        //returns the object in the list with the shortest path to reach
+        //THIS IS COMPUTATIONALLY COSTLY (framrate drop when active)
+        //don't run it every frame like a dumbass
         Transform bestTarget = null;
         float closestDistancePath = Mathf.Infinity;
         NavMeshPath path = new NavMeshPath();
@@ -175,6 +221,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
     float PathLength(NavMeshPath path)
     {
+        //gives the length of a given NavMeshPath
         if (path.corners.Length < 2)
             return 0;
 
