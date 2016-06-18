@@ -35,6 +35,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_OriginalCameraPosition;
         private bool m_Jumping;
 		private bool m_LightOn = false;
+		private bool m_cantStand;
 
         // Use this for initialization
         private void Start()
@@ -80,7 +81,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				m_IsCrouching = true;
 			}
 
-			if (Input.GetButtonUp ("Crouch") && m_IsCrouching) {
+			if (Input.GetButtonUp ("Crouch") && m_IsCrouching && !m_cantStand) {
 				gameObject.transform.localScale = new Vector3 (1, 1, 1);
 				m_WalkSpeed = 5;
 				m_IsCrouching = false;
@@ -136,6 +137,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
             UpdateCameraPosition(speed);
 
             m_MouseLook.UpdateCursorLock();
+
+			//TODO make character automatically stand when possible and not holding crouch
+			//check the for clearance above character
+			if(m_IsCrouching)
+			{
+				Ray ray = new Ray (gameObject.transform.position, Vector3.up);
+				//weird decimal is calculated from the y pos of the player when crouching (0.5800051)
+				m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
+			}
+
         }
 
 
