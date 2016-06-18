@@ -71,21 +71,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-			//FIXME crouching resets local positions of child gameobjects
-			/*if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
+
+			if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
 			{
-				gameObject.transform.localScale = new Vector3(0, .5F, 0);
+				gameObject.transform.localScale = new Vector3(1, .5F, 1);
 				m_WalkSpeed = 2.5f;
 				m_IsWalking = true;
 				m_IsCrouching = true;
 			}
 
 			if (Input.GetButtonUp ("Crouch") && m_IsCrouching) {
-				gameObject.transform.localScale = new Vector3 (0, 1, 0);
+				gameObject.transform.localScale = new Vector3 (1, 1, 1);
 				m_WalkSpeed = 5;
 				m_IsCrouching = false;
 			}
-			*/
+
 
 			if (Input.GetButtonUp ("Flashlight") && !m_LightOn) {
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 2.5f;
