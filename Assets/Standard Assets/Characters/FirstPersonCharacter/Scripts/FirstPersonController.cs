@@ -87,14 +87,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			}
 			*/
 
-			//TODO find a better way to implement this without needing a return
 			if (Input.GetButtonUp ("Flashlight") && !m_LightOn) {
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 2.5f;
 				m_LightOn = true;
-				return;
 			}
 
-			if (Input.GetButtonUp ("Flashlight") && m_LightOn) {
+			else if (Input.GetButtonUp ("Flashlight") && m_LightOn) {
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 0f;
 				m_LightOn = false;
 			}
