@@ -34,6 +34,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_PreviouslyGrounded;
         private Vector3 m_OriginalCameraPosition;
         private bool m_Jumping;
+		private bool m_LightOn = false;
 
         // Use this for initialization
         private void Start()
@@ -70,7 +71,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-			if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
+			//FIXME crouching resets local positions of child gameobjects
+			/*if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
 			{
 				gameObject.transform.localScale = new Vector3(0, .5F, 0);
 				m_WalkSpeed = 2.5f;
@@ -82,6 +84,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				gameObject.transform.localScale = new Vector3 (0, 1, 0);
 				m_WalkSpeed = 5;
 				m_IsCrouching = false;
+			}
+			*/
+
+			//TODO find a better way to implement this without needing a return
+			if (Input.GetButtonUp ("Flashlight") && !m_LightOn) {
+				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 2.5f;
+				m_LightOn = true;
+				return;
+			}
+
+			if (Input.GetButtonUp ("Flashlight") && m_LightOn) {
+				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 0f;
+				m_LightOn = false;
 			}
         }
 
