@@ -7,10 +7,10 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     public enum StackerGoal {PickTargetObject, PathToObject, PathToPile, FreezeWhenSeen}
     public StackerGoal CurrentGoal;
     public GameObject Goal_Object;
-    public Transform onhand;
     public Transform pile;
     public bool OnlyMoveWhenUnseen = false;
     public bool RecalcTargetDistsEveryFrame = false;
+    public float CarryPositionOffset;
     
     public float PickUpRange = 3;
     public float pile_size = 10;
@@ -20,9 +20,9 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     private bool IsHolding = false;
     private float base_speed;
 
-    public bool Searching=false;
-    public bool NearPile = false;
-    public bool NearTarget = false;
+    private bool Searching=false;
+    private bool NearPile = false;
+    private bool NearTarget = false;
 
     // Use this for initialization
     void Start () {
@@ -33,12 +33,12 @@ public class CubeStackingAIBehavior : MonoBehaviour {
 
     void OnDrawGizmos()
     {
-        if (Searching)
-            Gizmos.color = Color.yellow;
-        else
-            Gizmos.color = Color.white;
-        
+        Gizmos.color = Searching ? Color.yellow : Color.white;
+        //vision range of agent
         Gizmos.DrawWireSphere(transform.position, VisionRange);
+        //marker to show point where objects are held
+        //(radius is arbitrary, its a point)
+        Gizmos.DrawWireSphere(transform.TransformPoint(Vector3.forward * CarryPositionOffset), .25F);
     }
 
 
@@ -105,8 +105,10 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         {
             if (IsHolding)
             {
-                Goal_Object.GetComponent<Rigidbody>().AddForce((onhand.position - Goal_Object.transform.position) * 300);
-                Goal_Object.GetComponent<Rigidbody>().rotation = onhand.rotation;
+                //transform.TransformPoint(Vector3.right * 2)
+                //Goal_Object.GetComponent<Rigidbody>().AddForce((onhand.position - Goal_Object.transform.position) * 300);
+                Goal_Object.GetComponent<Rigidbody>().AddForce((transform.TransformPoint(Vector3.forward * CarryPositionOffset) - Goal_Object.transform.position) * 300);
+                Goal_Object.GetComponent<Rigidbody>().rotation = transform.rotation;
                 Goal_Object.GetComponent<Rigidbody>().drag = 15;
                 Goal_Object.GetComponent<Rigidbody>().angularDrag = 15;
             }
