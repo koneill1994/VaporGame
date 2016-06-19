@@ -36,6 +36,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
 		private bool m_LightOn = false;
 		private bool m_cantStand;
+		private bool m_willStand;
 
         // Use this for initialization
         private void Start()
@@ -79,6 +80,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				m_WalkSpeed = 2.5f;
 				m_IsWalking = true;
 				m_IsCrouching = true;
+			}
+
+			if (Input.GetButtonUp ("Crouch") && m_IsCrouching && m_cantStand) {
+				m_willStand = true;
+			}
+
+			if (m_willStand && !m_cantStand)
+			{
+				gameObject.transform.localScale = new Vector3 (1, 1, 1);
+				m_WalkSpeed = 5;
+				m_IsCrouching = false;
+				m_willStand = false;
 			}
 
 			if (Input.GetButtonUp ("Crouch") && m_IsCrouching && !m_cantStand) {
@@ -138,7 +151,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_MouseLook.UpdateCursorLock();
 
-			//TODO make character automatically stand when possible and not holding crouch
 			//check the for clearance above character
 			if(m_IsCrouching)
 			{
