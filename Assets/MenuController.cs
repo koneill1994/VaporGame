@@ -17,39 +17,24 @@ public class MenuController : MonoBehaviour
     
     void Start()
     {
-        /*
-        EditorBuildSettingsScene[] allScenes = EditorBuildSettings.scenes;
-        Debug.Log("All Scenes : Length : " + allScenes.Length);
-        string path;
-        for (int i = 0; i < allScenes.Length; i++)
-        {
-            Debug.Log("All Path : Scene : " + allScenes[i].path);
-            path = Path.GetFileNameWithoutExtension(allScenes[i].path);
-            Debug.Log("Clear Path : Scene : " + path);
-        }
-
         dropdown.ClearOptions();
-        for (int i= 0; i< SceneManager.sceneCountInBuildSettings; i++)
-        {
-            Debug.Log(allScenes[i].path);
-            //SceneManager.LoadSceneAsync(i);
-            Dropdown.OptionData list = new Dropdown.OptionData(allScenes[i].path);
-            dropdown.options.Add(list);
-        }*/
-
-        dropdown.ClearOptions();
-        string[] SceneNames = new string[] { "Levels_Test_1", "Test_Game", "Door Test", "Obstacle_Course"};
+        string[] SceneNames = new string[] { "Level_test_1", "Test_Game", "Door Test", "Obstacle_Course"};
 
         foreach (string name in SceneNames)
         {
             Dropdown.OptionData list = new Dropdown.OptionData(name);
             dropdown.options.Add(list);
         }
+        dropdown.RefreshShownValue();
+
 
         quitMenu = quitMenu.GetComponent<Canvas>();
         startText = startText.GetComponent<Button>();
         exitText = exitText.GetComponent<Button>();
         quitMenu.enabled = true;
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
     }
     
@@ -73,8 +58,9 @@ public class MenuController : MonoBehaviour
 
     public void StartLevel() //this function will be used on our Play button
     {
-        Debug.Log(dropdown.captionText.text);
-        //SceneManager.LoadScene(dropdown.captionText.text); //this will load our first level from our build settings. "1" is the second scene in our game
+        //Debug.Log("play button pressed");
+        //Debug.Log(dropdown.captionText.text);
+        SceneManager.LoadScene(dropdown.captionText.text); //this will load our first level from our build settings. "1" is the second scene in our game
 
     }
 
@@ -84,5 +70,11 @@ public class MenuController : MonoBehaviour
         Application.Quit(); //this will quit our game. Note this will only work after building the game
 
     }
-    
+
+    public void DeselectElement()
+    {
+        GameObject myEventSystem = GameObject.Find("EventSystem");
+        myEventSystem.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(null);
+    }
+
 }

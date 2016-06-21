@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement; // neded in order to load scenes
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -54,6 +55,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            if (Input.GetButtonUp("MainMenu"))
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
+
             RotateView();
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && m_CharacterController.isGrounded)
@@ -159,6 +165,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
 			}
 
+        }
+
+        void OnGUI()
+        {
+            GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
         }
 
 
