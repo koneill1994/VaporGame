@@ -35,6 +35,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_OriginalCameraPosition;
         private bool m_Jumping;
 		private bool m_LightOn = false;
+		private bool m_cantStand;
+		private bool m_willStand;
 
         // Use this for initialization
         private void Start()
@@ -71,30 +73,40 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
-			//FIXME crouching resets local positions of child gameobjects
-			/*if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
+
+			if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
 			{
-				gameObject.transform.localScale = new Vector3(0, .5F, 0);
+				gameObject.transform.localScale = new Vector3(1, .5F, 1);
 				m_WalkSpeed = 2.5f;
 				m_IsWalking = true;
 				m_IsCrouching = true;
 			}
 
-			if (Input.GetButtonUp ("Crouch") && m_IsCrouching) {
-				gameObject.transform.localScale = new Vector3 (0, 1, 0);
+			if (Input.GetButtonUp ("Crouch") && m_IsCrouching && m_cantStand) {
+				m_willStand = true;
+			}
+
+			if (m_willStand && !m_cantStand)
+			{
+				gameObject.transform.localScale = new Vector3 (1, 1, 1);
+				m_WalkSpeed = 5;
+				m_IsCrouching = false;
+				m_willStand = false;
+			}
+
+			if (Input.GetButtonUp ("Crouch") && m_IsCrouching && !m_cantStand) {
+				gameObject.transform.localScale = new Vector3 (1, 1, 1);
 				m_WalkSpeed = 5;
 				m_IsCrouching = false;
 			}
-			*/
 
-			//TODO find a better way to implement this without needing a return
+
 			if (Input.GetButtonUp ("Flashlight") && !m_LightOn) {
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 2.5f;
 				m_LightOn = true;
-				return;
 			}
 
-			if (Input.GetButtonUp ("Flashlight") && m_LightOn) {
+			else if (Input.GetButtonUp ("Flashlight") && m_LightOn) {
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 0f;
 				m_LightOn = false;
 			}
@@ -138,6 +150,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             UpdateCameraPosition(speed);
 
             m_MouseLook.UpdateCursorLock();
+
+			//check the for clearance above character
+			if(m_IsCrouching)
+			{
+				Ray ray = new Ray (gameObject.transform.position, Vector3.up);
+				//weird decimal is calculated from the y pos of the player when crouching (0.5800051)
+				m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
+			}
+
         }
 
 
