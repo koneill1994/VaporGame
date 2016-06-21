@@ -8,6 +8,7 @@ public class SpawnGrabbableOnUse : MonoBehaviour {
     public GameObject SpawnObject;
     public Vector3 SpawnOffset;
 
+    public string Message;
 
     // Use this for initialization
     void Start () {
@@ -42,7 +43,8 @@ public class SpawnGrabbableOnUse : MonoBehaviour {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
         {
-            GUI.Label(new Rect(Screen.width / 2, Screen.height / 2, 100, 20), "Hello World! ajdkhfalskhdflkasdhfl");
+            //Font.GetCharacterInfo(char ch, out characterInfo info, int messageSize = 0, FontStyle style = FontStyle.Normal);
+            GUI.Label(new Rect(Screen.width / 2, Screen.height / 2, Screen.width / 2, 20), "Spawn a Cube");
         }
     }
 
