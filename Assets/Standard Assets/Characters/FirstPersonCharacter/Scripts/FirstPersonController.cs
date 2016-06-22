@@ -24,6 +24,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private bool m_UseHeadBob;
         [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
         [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
+        [SerializeField] private CanvasGroup canvasGroup;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -38,7 +39,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		private bool m_LightOn = false;
 		private bool m_cantStand;
 		private bool m_willStand;
-        private bool isPause;
+        //private bool Pause;
 
         // Use this for initialization
         private void Start()
@@ -49,8 +50,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
             m_Jumping = false;
-            isPause = false;
             m_MouseLook.Init(transform , m_Camera.transform);
+            
+            //Pause = false;
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0f;
+                canvasGroup.blocksRaycasts = false;
+            }
         }
 
 
@@ -63,11 +70,29 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             if (Input.GetButtonUp("Cancel"))
             {
-                isPause = !isPause;
-                if (isPause)
+                if (Time.timeScale==1)
+                {
                     Time.timeScale = 0;
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = 1f; //this makes everything transparent
+                        canvasGroup.blocksRaycasts = true; //this prevents the UI element to receive input events
+                    }
+                }
                 else
+                {
                     Time.timeScale = 1;
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = 0f;
+                        canvasGroup.blocksRaycasts = false;
+                    }
+                }
+                //Pause = !Pause;
             }
 
             RotateView();
