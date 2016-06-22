@@ -38,6 +38,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		private bool m_LightOn = false;
 		private bool m_cantStand;
 		private bool m_willStand;
+        private bool isPause;
 
         // Use this for initialization
         private void Start()
@@ -48,7 +49,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
             m_Jumping = false;
-			m_MouseLook.Init(transform , m_Camera.transform);
+            isPause = false;
+            m_MouseLook.Init(transform , m_Camera.transform);
         }
 
 
@@ -58,6 +60,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (Input.GetButtonUp("MainMenu"))
             {
                 SceneManager.LoadScene("MainMenu");
+            }
+            if (Input.GetButtonUp("Cancel"))
+            {
+                isPause = !isPause;
+                if (isPause)
+                    Time.timeScale = 0;
+                else
+                    Time.timeScale = 1;
             }
 
             RotateView();
