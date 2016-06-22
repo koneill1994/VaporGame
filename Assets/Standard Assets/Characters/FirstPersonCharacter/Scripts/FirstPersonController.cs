@@ -69,8 +69,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 if (Time.timeScale == 0)
                 {
                     Time.timeScale = 1;
-                    SceneManager.LoadScene("MainMenu");
                 }
+                    SceneManager.LoadScene("MainMenu");
             }
             if (Input.GetButtonUp("Cancel"))
             {
