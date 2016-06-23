@@ -29,7 +29,6 @@ public class TerminalMenuController : MonoBehaviour {
             //use button is pressed
             if (Input.GetButtonUp("Use"))
             {
-                Debug.Log("RAYCAST HIT");
                 ToggleTerminal();
             }
         }
