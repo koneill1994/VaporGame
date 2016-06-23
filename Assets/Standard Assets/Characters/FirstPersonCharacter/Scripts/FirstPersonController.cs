@@ -98,8 +98,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 //Pause = !Pause;
             }
-
-            RotateView();
+            if (Time.timeScale == 1)
+            {
+                RotateView();
+            }
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && m_CharacterController.isGrounded)
             {
