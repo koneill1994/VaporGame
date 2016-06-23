@@ -8,9 +8,6 @@ using System.IO;
 public class PauseMenuController : MonoBehaviour
 {
 
-    public Button Resume;
-    public Button MainMenu;
-    public Button Exit;
     public CanvasGroup canvasGroup;
 
 
