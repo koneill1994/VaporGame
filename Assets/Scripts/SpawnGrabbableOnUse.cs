@@ -8,7 +8,7 @@ public class SpawnGrabbableOnUse : MonoBehaviour {
     public GameObject SpawnObject;
     public Vector3 SpawnOffset;
 
-    public string Message;
+    //public string Message;
 
     // Use this for initialization
     void Start () {
