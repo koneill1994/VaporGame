@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class TerminalMenuController : MonoBehaviour {
 
     public int distanceToItem;
+
+    public Light Spotlight;
+    public Slider LightSlider;
 
     private CanvasGroup canvasGroup;
     private bool TerminalActive = false;
@@ -60,6 +64,12 @@ public class TerminalMenuController : MonoBehaviour {
         }
 
         TerminalActive = !TerminalActive;
+    }
+
+    public void AdjustSliderForLight(float value)
+    {
+        Debug.Log(value);
+        Spotlight.intensity = LightSlider.value * 2.5f;
     }
 
 }
