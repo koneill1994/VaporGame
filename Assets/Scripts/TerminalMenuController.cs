@@ -68,7 +68,6 @@ public class TerminalMenuController : MonoBehaviour {
 
     public void AdjustSliderForLight(float value)
     {
-        Debug.Log(value);
         Spotlight.intensity = LightSlider.value * 2.5f;
     }
 
