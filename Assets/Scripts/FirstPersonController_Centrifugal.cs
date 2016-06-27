@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement; // neded in order to load scenes
 namespace UnityStandardAssets.Characters.FirstPerson
 {
     [RequireComponent(typeof (CharacterController))]
-    public class FirstPersonController : MonoBehaviour
+    public class FirstPersonController_Centrifugal : MonoBehaviour
     {
 		[SerializeField] private bool m_IsWalking;
 		[SerializeField] private bool m_IsCrouching;
@@ -25,7 +25,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
         [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
         [SerializeField] private CanvasGroup canvasGroup;
-        [SerializeField] private bool UsePhysicsGravity = true;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -67,14 +66,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
-            if (UsePhysicsGravity)
-            {
-                Gravity_analog = Physics.gravity;
-            }
-            else
-            {
-                Gravity_analog = Vector3.down * 9.81F;
-            }
 
 
             if (Input.GetButtonUp("MainMenu"))
@@ -189,7 +180,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MoveDir.x = desiredMove.x*speed;
             m_MoveDir.z = desiredMove.z*speed;
 
-
+            //
             if (m_CharacterController.isGrounded)
             {
                 m_MoveDir.y = -m_StickToGroundForce;

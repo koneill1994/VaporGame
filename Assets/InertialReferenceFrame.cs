@@ -1,0 +1,42 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public class InertialReferenceFrame : MonoBehaviour {
+
+    private float rotational_period;
+    public Vector3 RotationalAxis;
+
+    public float radius;
+    public float GravityAtRadius=9.81F;
+
+    public Transform player;
+
+    // Use this for initialization
+    void Start () {
+        rotational_period = 2 * Mathf.PI * Mathf.Sqrt(radius / GravityAtRadius);
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        //transform.Rotate(RotationalAxis*rotational_period*Time.deltaTime); //rotates RotationalAxis*rotational_period degrees per second around z axis
+
+        ConstantForce[] grav_objects = FindObjectsOfType(typeof(ConstantForce)) as ConstantForce[];
+
+        foreach (ConstantForce obj in grav_objects)
+        {
+            Vector3 pos = obj.gameObject.transform.position;
+            //X WILL be the same
+            //offset 
+            Vector3 centrifugal_force = new Vector3 (0, pos.y - transform.position.y, pos.z - transform.position.z);
+            obj.force = centrifugal_force * GravityAtRadius/radius;
+        }
+
+
+        //player.rotation = Quaternion.Euler(Mathf.Atan((player.position.x - transform.position.x) / (player.position.y - transform.position.y)), 0, 0);
+
+    }
+
+
+}
