@@ -37,8 +37,8 @@ public class InertialReferenceFrame : MonoBehaviour {
 
 
         player.rotation = Quaternion.Euler(Mathf.Atan((player.position.x - transform.position.x) / (player.position.y - transform.position.y)), 0, 0);
-        centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
-        player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
+        //centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
+        //player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
     }
 
 

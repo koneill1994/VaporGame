@@ -130,7 +130,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
 
-            Debug.Log(isGroundedCustom);
+            Debug.Log(GetComponent<Rigidbody>().velocity);
+
+            //to stop drifting when no input
+            if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0)
+            {
+                Vector3 oldvelocity = GetComponent<Rigidbody>().velocity;
+                GetComponent<Rigidbody>().velocity = new Vector3(0, oldvelocity.y, 0);
+            }
 
             Ray ray;
             RaycastHit hit;
@@ -220,7 +227,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             
             // apply constant weight force according to character normal:
-            GetComponent<Rigidbody>().AddForce(-Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
+            GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
 
         /*
