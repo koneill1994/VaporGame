@@ -32,13 +32,16 @@ public class InertialReferenceFrame : MonoBehaviour {
             //X WILL be the same
             //offset 
             centrifugal_force = new Vector3 (0, pos.y - transform.position.y, pos.z - transform.position.z);
-            obj.force = centrifugal_force * GravityAtRadius/radius;
+            if(obj.tag != "Player"){
+                obj.force = centrifugal_force * GravityAtRadius / radius;
+            }
         }
 
-
-        player.rotation = Quaternion.Euler(Mathf.Atan((player.position.x - transform.position.x) / (player.position.y - transform.position.y)), 0, 0);
-        //centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
-        //player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
+        
+        player.rotation = Quaternion.Euler(Mathf.Atan((player.position.z - transform.position.z) / (player.position.y - transform.position.y))*Mathf.Rad2Deg, 0, 0);
+        centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
+        player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
+        //player.gameObject.GetComponent<ConstantForce>().relativeForce = (centrifugal_force * player.gameObject.GetComponent<Rigidbody>().mass);
     }
 
 

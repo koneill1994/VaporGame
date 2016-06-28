@@ -161,7 +161,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             Quaternion targetRot = Quaternion.LookRotation(myForward, myNormal);
             //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
             // move the character forth/back with Vertical axis:
-            myTransform.Translate(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            translation = transform.rotation * translation;
+            myTransform.Translate(translation);
+            ////// ^^^ TRANSLATES LOCAL TO WORLD AXES
+            //////   MAKE IT SO IT TRANSLATES RELATIVE TO LOCAL ROTATION
+
 
             /*
             // the jump state needs to read here to make sure it is not missed
@@ -227,7 +232,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             
             // apply constant weight force according to character normal:
-            GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
+            //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
 
         /*
@@ -319,10 +324,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Input = new Vector2(horizontal, vertical);
         }
 
-
+        
         private void RotateView()
         {
-            m_MouseLook.LookRotation (transform, m_Camera.transform);
+            //m_MouseLook.LookRotation (transform, m_Camera.transform);
+
+
+            /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS
+            ////// MAKE IT LOCAL
+
+
         }
 
         /*
