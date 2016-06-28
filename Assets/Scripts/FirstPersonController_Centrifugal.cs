@@ -18,7 +18,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private float m_JumpSpeed;
         [SerializeField] private float m_StickToGroundForce;
         [SerializeField] private float m_GravityMultiplier;
-        [SerializeField] private MouseLook m_MouseLook;
+        [SerializeField] private MouseLook_Centrifugal m_MouseLook;
         [SerializeField] private bool m_UseFovKick;
         [SerializeField] private FOVKick m_FovKick = new FOVKick();
         [SerializeField] private bool m_UseHeadBob;
@@ -130,7 +130,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
 
-            Debug.Log(GetComponent<Rigidbody>().velocity);
+            //Debug.Log(GetComponent<Rigidbody>().velocity);
 
             //to stop drifting when no input
             if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0)
@@ -162,10 +162,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
             // move the character forth/back with Vertical axis:
             Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
-            translation = transform.rotation * translation;
+            
             myTransform.Translate(translation);
-            ////// ^^^ TRANSLATES LOCAL TO WORLD AXES
-            //////   MAKE IT SO IT TRANSLATES RELATIVE TO LOCAL ROTATION
+            //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
 
 
             /*
@@ -327,7 +326,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
-            //m_MouseLook.LookRotation (transform, m_Camera.transform);
+            m_MouseLook.LookRotation (transform, m_Camera.transform);
 
 
             /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS
