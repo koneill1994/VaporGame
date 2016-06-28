@@ -24,18 +24,21 @@ public class InertialReferenceFrame : MonoBehaviour {
 
         ConstantForce[] grav_objects = FindObjectsOfType(typeof(ConstantForce)) as ConstantForce[];
 
+        Vector3 centrifugal_force;
+
         foreach (ConstantForce obj in grav_objects)
         {
             Vector3 pos = obj.gameObject.transform.position;
             //X WILL be the same
             //offset 
-            Vector3 centrifugal_force = new Vector3 (0, pos.y - transform.position.y, pos.z - transform.position.z);
+            centrifugal_force = new Vector3 (0, pos.y - transform.position.y, pos.z - transform.position.z);
             obj.force = centrifugal_force * GravityAtRadius/radius;
         }
 
 
-        //player.rotation = Quaternion.Euler(Mathf.Atan((player.position.x - transform.position.x) / (player.position.y - transform.position.y)), 0, 0);
-
+        player.rotation = Quaternion.Euler(Mathf.Atan((player.position.x - transform.position.x) / (player.position.y - transform.position.y)), 0, 0);
+        centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
+        player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
     }
 
 

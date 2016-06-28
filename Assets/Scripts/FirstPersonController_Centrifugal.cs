@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement; // neded in order to load scenes
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
-    [RequireComponent(typeof (CharacterController))]
+    //[RequireComponent(typeof (CharacterController))]
     public class FirstPersonController_Centrifugal : MonoBehaviour
     {
 		[SerializeField] private bool m_IsWalking;
@@ -41,10 +41,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		private bool m_willStand;
         private Vector3 Gravity_analog;
 
+        //http://answers.unity3d.com/questions/155907/basic-movement-walking-on-walls.html
+
+        private bool isGroundedCustom;
+        private Vector3 myNormal;
+        private Vector3 surfaceNormal;
+        private float distGround;
+        private float deltaGround = 0.2f;
+        private CapsuleCollider myCollider;
+
+        private float moveSpeed = 6; // move speed
+        private float turnSpeed = 90; // turning speed (degrees/second)
+        private float lerpSpeed = 10; // smoothing speed
+
+        private Transform myTransform;
+
+
         // Use this for initialization
         private void Start()
         {
-            m_CharacterController = GetComponent<CharacterController>();
+            myCollider = GetComponent<CapsuleCollider>();
+            myNormal = transform.up;
+            distGround = myCollider.bounds.extents.y - myCollider.center.y;
+            myTransform = transform;
+
+
+            //m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
@@ -67,7 +89,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void Update()
         {
 
-
+            
             if (Input.GetButtonUp("MainMenu"))
             {
                 if (Time.timeScale == 0)
@@ -106,23 +128,52 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 RotateView();
             }
+
+
+            Debug.Log(isGroundedCustom);
+
+            Ray ray;
+            RaycastHit hit;
+
+            ray = new Ray(transform.position, -myNormal);
+
+            if (Physics.Raycast(ray, out hit))
+            { // use it to update myNormal and isGrounded
+                isGroundedCustom = hit.distance <= distGround + deltaGround;
+                surfaceNormal = hit.normal;
+            }
+            else
+            {
+                isGroundedCustom = false;
+                // assume usual ground normal to avoid "falling forever"
+                surfaceNormal = Vector3.up;
+            }
+            myNormal = Vector3.Lerp(myNormal, surfaceNormal, lerpSpeed * Time.deltaTime);
+            // find forward direction with new myNormal:
+            Vector3 myForward = Vector3.Cross(myTransform.right, myNormal);
+            Quaternion targetRot = Quaternion.LookRotation(myForward, myNormal);
+            //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
+            // move the character forth/back with Vertical axis:
+            myTransform.Translate(Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+
+            /*
             // the jump state needs to read here to make sure it is not missed
-            if (!m_Jump && m_CharacterController.isGrounded)
+            if (!m_Jump && isGroundedCustom)
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
 
-            if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
+            if (!m_PreviouslyGrounded && isGroundedCustom)
             {
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
-            if (!m_CharacterController.isGrounded && !m_Jumping && m_PreviouslyGrounded)
+            if (!isGroundedCustom && !m_Jumping && m_PreviouslyGrounded)
             {
                 m_MoveDir.y = 0f;
             }
 
-            m_PreviouslyGrounded = m_CharacterController.isGrounded;
+            m_PreviouslyGrounded = isGroundedCustom;
 
 
 			if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
@@ -161,58 +212,66 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				gameObject.transform.GetChild (0).gameObject.transform.GetChild (1).gameObject.GetComponent<Light> ().intensity = 0f;
 				m_LightOn = false;
 			}
+            */
         }
 
 
         private void FixedUpdate()
         {
-            float speed;
-            GetInput(out speed);
-            // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
+            
+            // apply constant weight force according to character normal:
+            GetComponent<Rigidbody>().AddForce(-Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
+            //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
 
-            // get a normal for the surface that is being touched to move along it
-            RaycastHit hitInfo;
-            Physics.SphereCast(transform.position, m_CharacterController.radius, Vector3.down, out hitInfo,
-                               m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+        /*
+        float speed;
+        GetInput(out speed);
+        // always move along the camera forward as it is the direction that it being aimed at
+        Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
 
-            m_MoveDir.x = desiredMove.x*speed;
-            m_MoveDir.z = desiredMove.z*speed;
+        // get a normal for the surface that is being touched to move along it
+        RaycastHit hitInfo;
+        Physics.SphereCast(transform.position, myCollider.radius, Vector3.down, out hitInfo,
+                           myCollider.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+        desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-            //
-            if (m_CharacterController.isGrounded)
+        m_MoveDir.x = desiredMove.x*speed;
+        m_MoveDir.z = desiredMove.z*speed;
+
+        //
+        if (isGroundedCustom)
+        {
+            m_MoveDir.y = -m_StickToGroundForce;
+
+            if (m_Jump)
             {
-                m_MoveDir.y = -m_StickToGroundForce;
-
-                if (m_Jump)
-                {
-                    m_MoveDir.y = m_JumpSpeed;
-                    m_Jump = false;
-                    m_Jumping = true;
-                }
+                m_MoveDir.y = m_JumpSpeed;
+                m_Jump = false;
+                m_Jumping = true;
             }
-            else
-            {
-                m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
-            }
-            m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
-
-            UpdateCameraPosition(speed);
-
-            m_MouseLook.UpdateCursorLock();
-
-			//check the for clearance above character
-			if(m_IsCrouching)
-			{
-				Ray ray = new Ray (gameObject.transform.position, Vector3.up);
-				//weird decimal is calculated from the y pos of the player when crouching (0.5800051)
-				m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
-			}
-
         }
+        else
+        {
+            m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
+        }
+        //m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
 
-        void OnGUI()
+        UpdateCameraPosition(speed);
+
+        m_MouseLook.UpdateCursorLock();
+
+        //check the for clearance above character
+        if(m_IsCrouching)
+        {
+            Ray ray = new Ray (gameObject.transform.position, Vector3.up);
+            //weird decimal is calculated from the y pos of the player when crouching (0.5800051)
+            m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
+        }
+        */
+
+    }
+
+    void OnGUI()
         {
             GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
         }
@@ -225,10 +284,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
-            if (m_CharacterController.velocity.magnitude > 0 && m_CharacterController.isGrounded)
+            if (GetComponent<Rigidbody>().velocity.magnitude > 0 && isGroundedCustom)
             {
                 m_Camera.transform.localPosition =
-                    m_HeadBob.DoHeadBob(m_CharacterController.velocity.magnitude +
+                    m_HeadBob.DoHeadBob(GetComponent<Rigidbody>().velocity.magnitude +
                                       (speed*(m_IsWalking ? 1f : m_RunstepLenghten)));
                 newCameraPosition = m_Camera.transform.localPosition;
                 newCameraPosition.y = m_Camera.transform.localPosition.y - m_JumpBob.Offset();
@@ -259,7 +318,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MouseLook.LookRotation (transform, m_Camera.transform);
         }
 
-
+        /*
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
             Rigidbody body = hit.collider.attachedRigidbody;
@@ -273,7 +332,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
-            body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+            body.AddForceAtPosition(GetComponent<Rigidbody>().velocity*0.1f, hit.point, ForceMode.Impulse);
         }
+        */
     }
 }
