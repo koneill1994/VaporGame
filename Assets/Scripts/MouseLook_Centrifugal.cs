@@ -34,11 +34,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
 
-            Vector3 currentRotation = character.localEulerAngles;
-            Vector3 desiredRotation = new Vector3 (currentRotation.x, yRot, currentRotation.z);
+            //Vector3 currentRotation = character.localEulerAngles;
+            Vector3 desiredRotation = new Vector3 (0f, yRot, 0f);
 
             //m_CharacterTargetRot *= Quaternion.Euler (0f, yRot, 0f);
-            m_CharacterTargetRot *= Quaternion.Euler(desiredRotation);
+            m_CharacterTargetRot = Quaternion.Euler(m_CharacterTargetRot.eulerAngles+desiredRotation);
+            Debug.Log(m_CharacterTargetRot.eulerAngles);
             m_CameraTargetRot *= Quaternion.Euler (-xRot, 0f, 0f);
 
             if(clampVerticalRotation)
@@ -54,10 +55,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             else
             {*/
 
-                character.Rotate(Vector3.up* Time.deltaTime* yRot*100);
-            
-                //character.localRotation = m_CharacterTargetRot;
-                camera.localRotation = m_CameraTargetRot;
+            //character.Rotate(Vector3.up* Time.deltaTime* yRot*100);
+
+            //character.localEulerAngles = character.localEulerAngles+ new Vector3 (0f, yRot, 0f);
+
+                character.localRotation = m_CharacterTargetRot;
+            camera.localRotation = m_CameraTargetRot;
             //}
 
             UpdateCursorLock();

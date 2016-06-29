@@ -37,9 +37,14 @@ public class InertialReferenceFrame : MonoBehaviour {
             }
         }
 
-        
+
         //player.rotation = Quaternion.Euler(Mathf.Atan((player.position.z - transform.position.z) / (player.position.y - transform.position.y))*Mathf.Rad2Deg, 0, 0);
-        player.rotation = Quaternion.Euler(-90-Mathf.Atan2((player.position.y - transform.position.y), (player.position.z - transform.position.z)) * Mathf.Rad2Deg, 0, 0);
+        //player.rotation = Quaternion.Euler(-90-Mathf.Atan2((player.position.y - transform.position.y), (player.position.z - transform.position.z)) * Mathf.Rad2Deg, 0, 0);
+
+        player.eulerAngles = new Vector3(-90 - Mathf.Atan2((player.position.y - transform.position.y), (player.position.z - transform.position.z)) * Mathf.Rad2Deg, 0, 0);
+        //^^^
+        //player.eulerAngles = new Vector3(player.eulerAngles.x, player.eulerAngles.y, player.eulerAngles.z);
+
         centrifugal_force = new Vector3(0, player.transform.position.y - transform.position.y, player.transform.position.z - transform.position.z);
         player.GetComponent<Rigidbody>().AddForce(centrifugal_force * GravityAtRadius / radius);
         //player.gameObject.GetComponent<ConstantForce>().relativeForce = (centrifugal_force * player.gameObject.GetComponent<Rigidbody>().mass);
