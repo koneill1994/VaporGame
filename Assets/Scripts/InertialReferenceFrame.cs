@@ -9,10 +9,10 @@ public class InertialReferenceFrame : MonoBehaviour {
     public float radius;
     public float GravityAtRadius=9.81F;
 
+    public bool rotation;
+
     public Transform player;
-
-
-    public float speed = 10f;
+    
 
     // Use this for initialization
     void Start () {
@@ -24,7 +24,8 @@ public class InertialReferenceFrame : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(RotationalAxis*(360/rotational_period)*Time.deltaTime); //rotates RotationalAxis*360/rotational_period degrees per second around z axis
+        if(rotation)
+            transform.Rotate(RotationalAxis*(360/rotational_period)*Time.deltaTime); //rotates RotationalAxis*360/rotational_period degrees per second around z axis
         
         ConstantForce[] grav_objects = FindObjectsOfType(typeof(ConstantForce)) as ConstantForce[];
 
