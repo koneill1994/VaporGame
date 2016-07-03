@@ -30,7 +30,15 @@ public class SpawnGrabbableOnUse : MonoBehaviour {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
             {
-                Instantiate(SpawnObject, transform.position + SpawnOffset, Quaternion.identity);
+                if (transform.parent != null)
+                {
+                    GameObject spawned = (GameObject)Instantiate(SpawnObject, transform.position + transform.rotation*SpawnOffset, transform.rotation);
+                    spawned.transform.parent = transform.parent;
+                }
+                else
+                {
+                    Instantiate(SpawnObject, transform.position + SpawnOffset, Quaternion.identity);
+                }
             }
         }
     }

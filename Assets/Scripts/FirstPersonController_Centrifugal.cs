@@ -25,6 +25,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
         [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
         [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private Transform reference_frame;
+
+        public Vector3 current_speed;
+        public Vector3 current_forces;
+        public bool freeze_velocity;
+        public float radius;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -55,7 +61,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float lerpSpeed = 10; // smoothing speed
 
         private Transform myTransform;
-
+        private Vector3 rotation;
 
         // Use this for initialization
         private void Start()
@@ -88,8 +94,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
-
             
+            current_speed = GetComponent<Rigidbody>().velocity;
+            current_forces = GetComponent<Rigidbody>().inertiaTensor;
+
             if (Input.GetButtonUp("MainMenu"))
             {
                 if (Time.timeScale == 0)
@@ -124,16 +132,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 //Pause = !Pause;
             }
+
+            rotation = new Vector3(-90 - Mathf.Atan2((transform.localPosition.y - reference_frame.position.y), (transform.localPosition.z - reference_frame.position.z)) * Mathf.Rad2Deg, 0, 0);
+            rotation.x = Mathf.Repeat(rotation.x, 360f);
+            
+            //v this allows camera motion via mouse
             if (Time.timeScale == 1)
             {
                 RotateView();
+                
             }
 
-
-            //Debug.Log(GetComponent<Rigidbody>().velocity);
+            //TO DO LIST
+            // reenable + debug additional functionality of script
+            // add coriolis (i.e. disble forces and parentage when object/player not on ground)
 
             //to stop drifting when no input
-            if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0)
+            if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0 || freeze_velocity)
             {
                 Vector3 oldvelocity = GetComponent<Rigidbody>().velocity;
                 GetComponent<Rigidbody>().velocity = new Vector3(0, oldvelocity.y, 0);
@@ -161,11 +176,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             Quaternion targetRot = Quaternion.LookRotation(myForward, myNormal);
             //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
             // move the character forth/back with Vertical axis:
+            GetInput(out moveSpeed);
             Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
-            
+            Debug.Log(moveSpeed);
             myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
-
+            //^move to fixed update?
 
             /*
             // the jump state needs to read here to make sure it is not missed
@@ -173,12 +189,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
-
+            
             if (!m_PreviouslyGrounded && isGroundedCustom)
             {
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
-            }
+            }/*
             if (!isGroundedCustom && !m_Jumping && m_PreviouslyGrounded)
             {
                 m_MoveDir.y = 0f;
@@ -230,57 +246,67 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void FixedUpdate()
         {
             
+            float GravityAtRadius = 9.81F;
+
+            Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
+            GetComponent<Rigidbody>().AddForce(centrifugal_force.normalized * GravityAtRadius);
+            Debug.DrawLine(transform.position, transform.position + centrifugal_force);
+
+            //this is causing the phantom forces ^^^ ???
+            //(floating point error accumulation?)
+            //get the direction from the normal & the intensity from magnitude fo 
+
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
 
-        /*
-        float speed;
-        GetInput(out speed);
-        // always move along the camera forward as it is the direction that it being aimed at
-        Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
+            /*
+            float speed;
+            GetInput(out speed);
+            // always move along the camera forward as it is the direction that it being aimed at
+            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
 
-        // get a normal for the surface that is being touched to move along it
-        RaycastHit hitInfo;
-        Physics.SphereCast(transform.position, myCollider.radius, Vector3.down, out hitInfo,
-                           myCollider.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-        desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
+            // get a normal for the surface that is being touched to move along it
+            RaycastHit hitInfo;
+            Physics.SphereCast(transform.position, myCollider.radius, Vector3.down, out hitInfo,
+                               myCollider.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
+            desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-        m_MoveDir.x = desiredMove.x*speed;
-        m_MoveDir.z = desiredMove.z*speed;
+            m_MoveDir.x = desiredMove.x*speed;
+            m_MoveDir.z = desiredMove.z*speed;
 
-        //
-        if (isGroundedCustom)
-        {
-            m_MoveDir.y = -m_StickToGroundForce;
-
-            if (m_Jump)
+            //
+            if (isGroundedCustom)
             {
-                m_MoveDir.y = m_JumpSpeed;
-                m_Jump = false;
-                m_Jumping = true;
+                m_MoveDir.y = -m_StickToGroundForce;
+
+                if (m_Jump)
+                {
+                    m_MoveDir.y = m_JumpSpeed;
+                    m_Jump = false;
+                    m_Jumping = true;
+                }
             }
+            else
+            {
+                m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
+            }
+            //m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
+
+            UpdateCameraPosition(speed);
+
+            m_MouseLook.UpdateCursorLock();
+
+            //check the for clearance above character
+            if(m_IsCrouching)
+            {
+                Ray ray = new Ray (gameObject.transform.position, Vector3.up);
+                //weird decimal is calculated from the y pos of the player when crouching (0.5800051)
+                m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
+            }
+            */
+
         }
-        else
-        {
-            m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
-        }
-        //m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
-
-        UpdateCameraPosition(speed);
-
-        m_MouseLook.UpdateCursorLock();
-
-        //check the for clearance above character
-        if(m_IsCrouching)
-        {
-            Ray ray = new Ray (gameObject.transform.position, Vector3.up);
-            //weird decimal is calculated from the y pos of the player when crouching (0.5800051)
-            m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
-        }
-        */
-
-    }
 
     void OnGUI()
         {
@@ -326,7 +352,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
-            m_MouseLook.LookRotation (transform, m_Camera.transform);
+            m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
 
 
             /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS

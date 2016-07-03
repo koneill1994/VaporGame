@@ -20,26 +20,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Quaternion m_CharacterTargetRot;
         private Quaternion m_CameraTargetRot;
         private bool m_cursorIsLocked = true;
+        private float yRotSum=0;
 
         public void Init(Transform character, Transform camera)
         {
             m_CharacterTargetRot = character.localRotation;
-            Debug.Log(m_CharacterTargetRot);
             m_CameraTargetRot = camera.localRotation;
         }
 
 
-        public void LookRotation(Transform character, Transform camera)
+        public void LookRotation(Transform character, Transform camera, Vector3 rotation)
         {
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
-
-            //Vector3 currentRotation = character.localEulerAngles;
-            Vector3 desiredRotation = new Vector3 (0f, yRot, 0f);
-
+            
             //m_CharacterTargetRot *= Quaternion.Euler (0f, yRot, 0f);
-            m_CharacterTargetRot = Quaternion.Euler(m_CharacterTargetRot.eulerAngles+desiredRotation);
-            Debug.Log(m_CharacterTargetRot.eulerAngles);
             m_CameraTargetRot *= Quaternion.Euler (-xRot, 0f, 0f);
 
             if(clampVerticalRotation)
@@ -55,11 +50,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             else
             {*/
 
-            //character.Rotate(Vector3.up* Time.deltaTime* yRot*100);
-
-            //character.localEulerAngles = character.localEulerAngles+ new Vector3 (0f, yRot, 0f);
-
-                character.localRotation = m_CharacterTargetRot;
+            yRotSum += yRot;
+            yRotSum = Mathf.Repeat(yRotSum, 360);
+            character.localEulerAngles = rotation;
+            character.Rotate(Vector3.up, yRotSum);
+            //IT WORKS
+            
             camera.localRotation = m_CameraTargetRot;
             //}
 
