@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'unity_World2Shadow' with 'unity_WorldToShadow'
+
 Shader "Hidden/AtmosphericScattering_Occlusion" {
 CGINCLUDE
 	#pragma target 3.0
@@ -58,12 +60,12 @@ CGINCLUDE
 
 	inline float4 getShadowCoord(float4 wpos, fixed4 cascadeWeights) {
 #if defined(SHADER_API_D3D11)
-		return mul(unity_World2Shadow[(int)dot(cascadeWeights, float4(1,1,1,1))], wpos);
+		return mul(unity_WorldToShadow[(int)dot(cascadeWeights, float4(1,1,1,1))], wpos);
 #else
-		float3 sc0 = mul(unity_World2Shadow[0], wpos).xyz;
-		float3 sc1 = mul(unity_World2Shadow[1], wpos).xyz;
-		float3 sc2 = mul(unity_World2Shadow[2], wpos).xyz;
-		float3 sc3 = mul(unity_World2Shadow[3], wpos).xyz;
+		float3 sc0 = mul(unity_WorldToShadow[0], wpos).xyz;
+		float3 sc1 = mul(unity_WorldToShadow[1], wpos).xyz;
+		float3 sc2 = mul(unity_WorldToShadow[2], wpos).xyz;
+		float3 sc3 = mul(unity_WorldToShadow[3], wpos).xyz;
 		return float4(sc0 * cascadeWeights[0] + sc1 * cascadeWeights[1] + sc2 * cascadeWeights[2] + sc3 * cascadeWeights[3], 1);
 #endif
 	}
