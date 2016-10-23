@@ -4,11 +4,12 @@ using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
 using UnityEngine.SceneManagement; // neded in order to load scenes
+using UnityEngine.Networking;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
     //[RequireComponent(typeof (CharacterController))]
-    public class FirstPersonController_Centrifugal_mp : MonoBehaviour
+    public class FirstPersonController_Centrifugal_mp : NetworkBehaviour
     {
 		[SerializeField] private bool m_IsWalking;
 		[SerializeField] private bool m_IsCrouching;
@@ -33,7 +34,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float radius;
         public float jump_force;
 
-        private Camera m_Camera;
+        public Camera m_Camera;
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -67,6 +68,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         private void Start()
         {
+
+
             myCollider = GetComponent<CapsuleCollider>();
             myNormal = transform.up;
             distGround = myCollider.bounds.extents.y - myCollider.center.y;
@@ -75,7 +78,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //reference_frame = transform.parent.transform;
 
             //m_CharacterController = GetComponent<CharacterController>();
-            m_Camera = Camera.main;
+            //m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
@@ -96,6 +99,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             Debug.Log("update0");
             current_speed = GetComponent<Rigidbody>().velocity;
             current_forces = GetComponent<Rigidbody>().inertiaTensor;
@@ -144,9 +152,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (Time.timeScale == 1)
             {
                 RotateView();
-                
+                Debug.Log("update3");
+
             }
-            Debug.Log("update3");
             //TO DO LIST
             // reenable + debug additional functionality of script
             // add coriolis (i.e. disble forces and parentage when object/player not on ground)
@@ -250,7 +258,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
-            
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             float GravityAtRadius = 9.81F;
 
             //Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
@@ -326,12 +338,22 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
     void OnGUI()
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
         }
 
 
         private void UpdateCameraPosition(float speed)
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             Vector3 newCameraPosition;
             if (!m_UseHeadBob)
             {
@@ -356,6 +378,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void GetInput(out float speed)
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+
             // Read input
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
