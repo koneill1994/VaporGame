@@ -73,7 +73,7 @@ public class PickUpNew : MonoBehaviour {
         else if (Input.GetButtonUp("Use") && IsHolding) // This will release the object 
         {
             IsHolding = false;
-			hitObject.GetComponent<Rigidbody>().drag = .5f;
+			hitObject.GetComponent<Rigidbody>().drag = 0;
 			hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
         }
 
@@ -81,7 +81,7 @@ public class PickUpNew : MonoBehaviour {
         {
             //Debug.Log("Throw");
             IsHolding = false;
-            hitObject.GetComponent<Rigidbody>().drag = .5f;
+            hitObject.GetComponent<Rigidbody>().drag = 0;
             hitObject.GetComponent<Rigidbody>().angularDrag = .05f;
 
             hitObject.GetComponent<Rigidbody>().AddForce(onhand.forward * ThrowForce);

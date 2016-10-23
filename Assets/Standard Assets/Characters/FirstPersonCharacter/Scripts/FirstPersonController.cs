@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement; // neded in order to load scenes
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -23,6 +24,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private bool m_UseHeadBob;
         [SerializeField] private CurveControlledBob m_HeadBob = new CurveControlledBob();
         [SerializeField] private LerpControlledBob m_JumpBob = new LerpControlledBob();
+        [SerializeField] private CanvasGroup canvasGroup;
+        [SerializeField] private bool UsePhysicsGravity = true;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -37,6 +40,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		private bool m_LightOn = false;
 		private bool m_cantStand;
 		private bool m_willStand;
+        private Vector3 Gravity_analog;
 
         // Use this for initialization
         private void Start()
@@ -47,14 +51,70 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
             m_Jumping = false;
-			m_MouseLook.Init(transform , m_Camera.transform);
+            m_MouseLook.Init(transform , m_Camera.transform);
+
+            Gravity_analog = Physics.gravity;
+
+            //Pause = false;
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 0f;
+                canvasGroup.blocksRaycasts = false;
+            }
         }
 
 
         // Update is called once per frame
         private void Update()
         {
-            RotateView();
+            if (UsePhysicsGravity)
+            {
+                Gravity_analog = Physics.gravity;
+            }
+            else
+            {
+                Gravity_analog = Vector3.down * 9.81F;
+            }
+
+
+            if (Input.GetButtonUp("MainMenu"))
+            {
+                if (Time.timeScale == 0)
+                {
+                    Time.timeScale = 1;
+                }
+                    SceneManager.LoadScene("MainMenu");
+            }
+            if (Input.GetButtonUp("Cancel"))
+            {
+                if (Time.timeScale==1)
+                {
+                    Time.timeScale = 0;
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = 1f; //this makes everything transparent
+                        canvasGroup.blocksRaycasts = true; //this prevents the UI element to receive input events
+                    }
+                }
+                else
+                {
+                    Time.timeScale = 1;
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                    if (canvasGroup != null)
+                    {
+                        canvasGroup.alpha = 0f;
+                        canvasGroup.blocksRaycasts = false;
+                    }
+                }
+                //Pause = !Pause;
+            }
+            if (Time.timeScale == 1)
+            {
+                RotateView();
+            }
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && m_CharacterController.isGrounded)
             {
@@ -143,7 +203,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else
             {
-                m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
+                m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
             }
             m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
 
@@ -159,6 +219,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 				m_cantStand = Physics.SphereCast (ray, .5f, 0.8799949f);
 			}
 
+        }
+
+        void OnGUI()
+        {
+            GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
         }
 
 
