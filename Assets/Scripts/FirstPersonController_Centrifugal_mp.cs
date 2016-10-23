@@ -103,6 +103,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
+        //look at
+        // https://forum.unity3d.com/threads/make-an-object-invisible-to-other-players-in-network.97924/#post-639557
+        // on how to make visor invisible to self
 
         // Update is called once per frame
         private void Update()
