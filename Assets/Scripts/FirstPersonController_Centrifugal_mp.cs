@@ -85,6 +85,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (isLocalPlayer)
             {
                 m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
+                transform.Find("Visor").GetComponent<Renderer>().enabled = false;
             }
             
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
@@ -101,6 +102,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 canvasGroup.alpha = 0f;
                 canvasGroup.blocksRaycasts = false;
             }
+            
+
         }
 
         //look at
@@ -115,7 +118,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 return;
             }
-            Debug.Log("update0");
             current_speed = GetComponent<Rigidbody>().velocity;
             current_forces = GetComponent<Rigidbody>().inertiaTensor;
             /*
@@ -214,7 +216,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 // assume usual ground normal to avoid "falling forever"
                 surfaceNormal = Vector3.up;
             }
-            Debug.Log("update4");
             myNormal = Vector3.Lerp(myNormal, surfaceNormal, lerpSpeed * Time.deltaTime);
             // find forward direction with new myNormal:
             Vector3 myForward = Vector3.Cross(myTransform.right, myNormal);
@@ -227,7 +228,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
             //^move to fixed update?
-            Debug.Log("update5");
 
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && isGroundedCustom)
@@ -373,7 +373,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             */
 
         }
-
+/*
     void OnGUI()
         {
             //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
@@ -382,7 +382,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
             GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
-        }
+        }*/
 
 
         private void UpdateCameraPosition(float speed)
