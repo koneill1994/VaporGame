@@ -34,6 +34,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float radius;
         public float jump_force;
 
+        private bool is_paused=false;
+
         public Camera m_Camera;
         private bool m_Jump;
         private float m_YRotation;
@@ -79,6 +81,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             //m_CharacterController = GetComponent<CharacterController>();
             //m_Camera = Camera.main;
+
+            if (isLocalPlayer)
+            {
+                m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
+            }
+            
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
@@ -107,7 +115,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             Debug.Log("update0");
             current_speed = GetComponent<Rigidbody>().velocity;
             current_forces = GetComponent<Rigidbody>().inertiaTensor;
-
+            /*
             if (Input.GetButtonUp("MainMenu"))
             {
                 if (Time.timeScale == 0)
@@ -140,20 +148,41 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         canvasGroup.blocksRaycasts = false;
                     }
                 }
-                //Pause = !Pause;
+            //Pause = !Pause;
+            // ^^^^ Disabled so that one player can't freeze the entire server
+            //   more reasonable pause controls below
+        }*/
+
+            if (Input.GetButtonUp("Cancel"))
+            {
+                is_paused = !is_paused;
             }
-            Debug.Log("update1");
+
+
+            if (!is_paused)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+
+
             if (reference_frame != null) {
                 rotation = new Vector3(-90 - Mathf.Atan2((transform.localPosition.y - reference_frame.position.y), (transform.localPosition.z - reference_frame.position.z)) * Mathf.Rad2Deg, 0, 0);
                 rotation.x = Mathf.Repeat(rotation.x, 360f);
             }
-            Debug.Log("update2");
+            else
+            {
+                GetComponent<Rigidbody>().freezeRotation = true;
+            }
             //v this allows camera motion via mouse
-            if (Time.timeScale == 1)
+            if (is_paused)
             {
                 RotateView();
-                Debug.Log("update3");
-
             }
             //TO DO LIST
             // reenable + debug additional functionality of script
@@ -258,7 +287,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
-            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+
+            if (reference_frame == null)
+            {
+                GetComponent<Rigidbody>().freezeRotation = true;
+            }
+
+                //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
             if (!isLocalPlayer)
             {
                 return;
@@ -392,6 +427,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
+
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
 
 
