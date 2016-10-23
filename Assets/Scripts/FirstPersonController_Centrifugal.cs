@@ -31,6 +31,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public Vector3 current_forces;
         public bool freeze_velocity;
         public float radius;
+        public float jump_force;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -178,12 +179,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // move the character forth/back with Vertical axis:
             GetInput(out moveSpeed);
             Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
-            Debug.Log(moveSpeed);
+            //Debug.Log(moveSpeed);
             myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
             //^move to fixed update?
 
-            /*
+            
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && isGroundedCustom)
             {
@@ -199,10 +200,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir.y = 0f;
             }
-
+            */
             m_PreviouslyGrounded = isGroundedCustom;
 
-
+            /*
 			if (Input.GetButtonDown ("Crouch") && !m_IsCrouching) 
 			{
 				gameObject.transform.localScale = new Vector3(1, .5F, 1);
@@ -274,25 +275,32 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             m_MoveDir.x = desiredMove.x*speed;
             m_MoveDir.z = desiredMove.z*speed;
-
+            */
             //
+
             if (isGroundedCustom)
             {
-                m_MoveDir.y = -m_StickToGroundForce;
+                //m_MoveDir.y = -m_StickToGroundForce;
 
                 if (m_Jump)
                 {
-                    m_MoveDir.y = m_JumpSpeed;
+                    Debug.Log("Jump");
+                    //m_MoveDir.y = m_JumpSpeed;
                     m_Jump = false;
                     m_Jumping = true;
+                    Debug.Log(GetComponent<Rigidbody>().velocity);
+                    GetComponent<Rigidbody>().AddForce(-jump_force * centrifugal_force);
+                    Debug.Log(GetComponent<Rigidbody>().velocity);
+                    Debug.Log("");
                 }
             }
+            /*
             else
             {
                 m_MoveDir += Gravity_analog * m_GravityMultiplier*Time.fixedDeltaTime;
             }
             //m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
-
+            /*
             UpdateCameraPosition(speed);
 
             m_MouseLook.UpdateCursorLock();
