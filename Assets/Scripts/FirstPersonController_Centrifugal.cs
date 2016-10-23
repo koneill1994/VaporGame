@@ -249,13 +249,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             
             float GravityAtRadius = 9.81F;
 
-            Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
-            GetComponent<Rigidbody>().AddForce(centrifugal_force.normalized * GravityAtRadius);
-            Debug.DrawLine(transform.position, transform.position + centrifugal_force);
+            //Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
+            //GetComponent<Rigidbody>().AddForce(centrifugal_force.normalized * GravityAtRadius);
+            //Debug.DrawLine(transform.position, transform.position + centrifugal_force);
 
             //this is causing the phantom forces ^^^ ???
             //(floating point error accumulation?)
             //get the direction from the normal & the intensity from magnitude fo 
+
+            GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
+
+
 
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
@@ -289,7 +293,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_Jump = false;
                     m_Jumping = true;
                     Debug.Log(GetComponent<Rigidbody>().velocity);
-                    GetComponent<Rigidbody>().AddForce(-jump_force * centrifugal_force);
+                    GetComponent<Rigidbody>().AddRelativeForce(jump_force * transform.up);
                     Debug.Log(GetComponent<Rigidbody>().velocity);
                     Debug.Log("");
                 }
