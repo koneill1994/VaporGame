@@ -1,4 +1,6 @@
-﻿Shader "Volund/Atmospheric Scattering Sky" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Volund/Atmospheric Scattering Sky" {
 Properties {
 	_MainTex ("Base (RGB)", 2D) = "white" {}
 }
@@ -44,7 +46,7 @@ struct a2v {
 v2f vert(a2v IN) {
 	v2f OUT;
 	
-	float4 worldPos = IN.vertex * float4(_Object2World[0][0], _Object2World[1][1], _Object2World[2][2], 1.f);
+	float4 worldPos = IN.vertex * float4(unity_ObjectToWorld[0][0], unity_ObjectToWorld[1][1], unity_ObjectToWorld[2][2], 1.f);
 	worldPos.xyz *= float3(u_SkyDomeScale.x, worldPos.y > 0.f ? u_SkyDomeScale.y : 1.f, u_SkyDomeScale.z);
 	
 	float3 worldViewVec = worldPos.xyz;

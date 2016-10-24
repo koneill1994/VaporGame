@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "Volund/Cloud Scatter" {
 Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,0.5)
@@ -60,7 +62,7 @@ Category {
 				#endif
 				o.color = v.color;
 				o.texcoord = TRANSFORM_TEX(v.texcoord,_MainTex) + _ScrollUV.xy * _Time.y;
-				VOLUND_TRANSFER_SCATTER(mul(_Object2World, v.vertex), o);
+				VOLUND_TRANSFER_SCATTER(mul(unity_ObjectToWorld, v.vertex), o);
 				return o;
 			}
 

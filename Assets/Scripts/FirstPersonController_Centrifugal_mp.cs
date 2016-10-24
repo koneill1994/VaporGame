@@ -4,11 +4,12 @@ using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
 using UnityEngine.SceneManagement; // neded in order to load scenes
+using UnityEngine.Networking;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
     //[RequireComponent(typeof (CharacterController))]
-    public class FirstPersonController_Centrifugal : MonoBehaviour
+    public class FirstPersonController_Centrifugal_mp : NetworkBehaviour
     {
 		[SerializeField] private bool m_IsWalking;
 		[SerializeField] private bool m_IsCrouching;
@@ -33,7 +34,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float radius;
         public float jump_force;
 
-        private Camera m_Camera;
+        private bool is_paused=false;
+
+        public Camera m_Camera;
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -67,14 +70,24 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         private void Start()
         {
+
+
             myCollider = GetComponent<CapsuleCollider>();
             myNormal = transform.up;
             distGround = myCollider.bounds.extents.y - myCollider.center.y;
             myTransform = transform;
 
+            //reference_frame = transform.parent.transform;
 
             //m_CharacterController = GetComponent<CharacterController>();
-            m_Camera = Camera.main;
+            //m_Camera = Camera.main;
+
+            if (isLocalPlayer)
+            {
+                m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
+                transform.Find("Visor").GetComponent<Renderer>().enabled = false;
+            }
+            
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, 0);
@@ -89,27 +102,36 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 canvasGroup.alpha = 0f;
                 canvasGroup.blocksRaycasts = false;
             }
+            
+
         }
 
+        //look at
+        // https://forum.unity3d.com/threads/make-an-object-invisible-to-other-players-in-network.97924/#post-639557
+        // on how to make visor invisible to self
 
         // Update is called once per frame
         private void Update()
         {
-            
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             current_speed = GetComponent<Rigidbody>().velocity;
             current_forces = GetComponent<Rigidbody>().inertiaTensor;
-
+            /*
             if (Input.GetButtonUp("MainMenu"))
             {
                 if (Time.timeScale == 0)
                 {
                     Time.timeScale = 1;
                 }
-                    SceneManager.LoadScene("MainMenu");
+                SceneManager.LoadScene("MainMenu");
             }
             if (Input.GetButtonUp("Cancel"))
             {
-                if (Time.timeScale==1)
+                if (Time.timeScale == 1)
                 {
                     Time.timeScale = 0;
                     Cursor.visible = true;
@@ -131,30 +153,53 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         canvasGroup.blocksRaycasts = false;
                     }
                 }
-                //Pause = !Pause;
+            //Pause = !Pause;
+            // ^^^^ Disabled so that one player can't freeze the entire server
+            //   more reasonable pause controls below
+        }*/
+
+            if (Input.GetButtonUp("Cancel"))
+            {
+                is_paused = !is_paused;
             }
 
-            rotation = new Vector3(-90 - Mathf.Atan2((transform.localPosition.y - reference_frame.position.y), (transform.localPosition.z - reference_frame.position.z)) * Mathf.Rad2Deg, 0, 0);
-            rotation.x = Mathf.Repeat(rotation.x, 360f);
-            
+
+            if (!is_paused)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+
+
+            if (reference_frame != null) {
+                rotation = new Vector3(-90 - Mathf.Atan2((transform.localPosition.y - reference_frame.position.y), (transform.localPosition.z - reference_frame.position.z)) * Mathf.Rad2Deg, 0, 0);
+                rotation.x = Mathf.Repeat(rotation.x, 360f);
+            }
+            else
+            {
+                GetComponent<Rigidbody>().freezeRotation = true;
+            }
             //v this allows camera motion via mouse
-            if (Time.timeScale == 1)
+            if (is_paused)
             {
                 RotateView();
-                
             }
-
             //TO DO LIST
             // reenable + debug additional functionality of script
             // add coriolis (i.e. disble forces and parentage when object/player not on ground)
 
             //to stop drifting when no input
-            if(Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0 || freeze_velocity)
+            if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0 || freeze_velocity)
             {
                 Vector3 oldvelocity = GetComponent<Rigidbody>().velocity;
                 GetComponent<Rigidbody>().velocity = new Vector3(0, oldvelocity.y, 0);
             }
-
+            
             Ray ray;
             RaycastHit hit;
 
@@ -184,7 +229,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
             //^move to fixed update?
 
-            
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump && isGroundedCustom)
             {
@@ -246,7 +290,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
-            
+
+            if (reference_frame == null)
+            {
+                GetComponent<Rigidbody>().freezeRotation = true;
+            }
+
+                //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             float GravityAtRadius = 9.81F;
 
             //Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
@@ -319,15 +373,25 @@ namespace UnityStandardAssets.Characters.FirstPerson
             */
 
         }
-
+/*
     void OnGUI()
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             GUI.Label(new Rect(20, 20, Screen.width / 2, 20), "Hit M to return to the main menu");
-        }
+        }*/
 
 
         private void UpdateCameraPosition(float speed)
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+            if (!isLocalPlayer)
+            {
+                return;
+            }
             Vector3 newCameraPosition;
             if (!m_UseHeadBob)
             {
@@ -352,6 +416,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void GetInput(out float speed)
         {
+            //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
+
             // Read input
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
@@ -364,6 +430,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
+
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
 
 

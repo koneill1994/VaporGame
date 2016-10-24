@@ -8,12 +8,12 @@ public class CustomGravity : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+        /*
         if (GetComponent<ConstantForce>() != null)
         {
             GetComponent<ConstantForce>().force = Gravity_Vector;
         }
-
+        */
         
 
         
@@ -24,5 +24,8 @@ public class CustomGravity : MonoBehaviour {
         Rigidbody rb = GetComponent<Rigidbody>();
 
         Gravity_Vector = Vector3.down * gravity_acceleration * rb.mass;
+
+        rb.AddRelativeForce(Gravity_Vector);
+
     }
 }

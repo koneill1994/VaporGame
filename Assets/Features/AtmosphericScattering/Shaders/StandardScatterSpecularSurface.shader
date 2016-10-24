@@ -1,4 +1,6 @@
-﻿Shader "Volund/Standard Scatter (Specular, Surface)" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Volund/Standard Scatter (Specular, Surface)" {
 Properties {
 	_Color("Color", Color) = (1,1,1,1)
 	_MainTex("Albedo", 2D) = "white" {}
@@ -88,7 +90,7 @@ Category {
 
 		void StandardScatterSurfaceVertex (inout appdata_full v, out Input o) {
 			StandardSurfaceVertex(v, o);
-			SURFACE_SCATTER_TRANSFER(mul(_Object2World, v.vertex).xyz, o);
+			SURFACE_SCATTER_TRANSFER(mul(unity_ObjectToWorld, v.vertex).xyz, o);
 		}
 
 		void StandardScatterSurfaceSpecularFinal(Input IN, SurfaceOutputStandardSpecular o, inout half4 color) {
