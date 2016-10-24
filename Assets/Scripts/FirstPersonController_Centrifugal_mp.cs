@@ -70,6 +70,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         private void Start()
         {
+            m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
+
+            //disable everyone's camera and audio listener
+            //they will be enabled ONLY FOR THE CLIENT'S PLAYER MODEL below
+            m_Camera.enabled = false;
+            m_Camera.gameObject.GetComponent<AudioListener>().enabled = false;
 
 
             myCollider = GetComponent<CapsuleCollider>();
@@ -84,7 +90,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (isLocalPlayer)
             {
-                m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
+                //enable client's camera & audio listener
+                m_Camera.enabled = true;
+                m_Camera.gameObject.GetComponent<AudioListener>().enabled = true;
+                //hide visor on self
                 transform.Find("Visor").GetComponent<Renderer>().enabled = false;
             }
             
