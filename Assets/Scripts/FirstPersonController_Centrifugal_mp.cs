@@ -35,6 +35,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float jump_force;
 
         private bool is_paused=false;
+        private Vector3 translation;
 
         public Camera m_Camera;
         private bool m_Jump;
@@ -232,9 +233,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
             // move the character forth/back with Vertical axis:
             GetInput(out moveSpeed);
-            Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            //translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed, 0, Input.GetAxis("Vertical") * moveSpeed);
+            translation = myTransform.TransformDirection(translation);
             //Debug.Log(moveSpeed);
-            myTransform.Translate(translation);
+            //myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
             //^move to fixed update?
 
@@ -322,8 +325,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
 
+            GetComponent<Rigidbody>().velocity = translation;
 
-
+            Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);
