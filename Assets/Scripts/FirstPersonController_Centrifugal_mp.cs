@@ -96,6 +96,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Camera.gameObject.GetComponent<AudioListener>().enabled = true;
                 //hide visor on self
                 transform.Find("Visor").GetComponent<Renderer>().enabled = false;
+
+                GameObject[] g = GameObject.FindGameObjectsWithTag("terminal");
+                for (int i = 0; i<g.Length; i++)
+                {
+                    g[i].GetComponent<mp_TerminalMenuController>().player_camera = m_Camera;
+
+                }
+
+                
+
             }
             
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
@@ -327,7 +337,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             GetComponent<Rigidbody>().velocity = translation;
 
-            Debug.Log(GetComponent<Rigidbody>().velocity);
+            //Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);

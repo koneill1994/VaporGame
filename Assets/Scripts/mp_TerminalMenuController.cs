@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class TerminalMenuController : MonoBehaviour {
+public class mp_TerminalMenuController : MonoBehaviour {
 
     public int distanceToItem;
 
@@ -13,6 +13,8 @@ public class TerminalMenuController : MonoBehaviour {
     private bool TerminalActive = false;
 
     public Camera player_camera;
+
+    //mp part is still WIP
 
     // Use this for initialization
     void Start()
@@ -26,25 +28,28 @@ public class TerminalMenuController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {                
-        RaycastHit hit;
-        //Ray ray = GameObject.FindWithTag("client_cam").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        Ray ray = player_camera.ScreenPointToRay(Input.mousePosition);
-        //see if there's a terminal in front of the player
-        if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
+    void Update()
+    {
+        if (player_camera != null)
         {
-            Debug.Log("RaycastHit");
-            //use button is pressed
-            if (Input.GetButtonUp("Use"))
+            RaycastHit hit;
+            //Ray ray = GameObject.FindWithTag("client_cam").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+            Ray ray = player_camera.ScreenPointToRay(Input.mousePosition);
+            //see if there's a terminal in front of the player
+            if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
+            {
+                //use button is pressed
+                if (Input.GetButtonUp("Use"))
+                {
+                    ToggleTerminal();
+                }
+            }
+            //make sure the terminal is close enough to be activated
+            Vector3 offset = transform.position - player_camera.transform.position;
+            if (offset.sqrMagnitude > Mathf.Pow(distanceToItem, 2F) && TerminalActive)
             {
                 ToggleTerminal();
-                Debug.Log("HIT");
             }
-        }
-        Vector3 offset = transform.position - Camera.main.transform.position;
-        if (offset.sqrMagnitude > Mathf.Pow(distanceToItem,2F) && TerminalActive)
-        {
-            ToggleTerminal();
         }
     }
 
