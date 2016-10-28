@@ -103,26 +103,28 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     g[i].GetComponent<mp_TerminalMenuController>().player_camera = m_Camera;
 
                 }
-
                 
+            
+
+                m_OriginalCameraPosition = m_Camera.transform.localPosition;
+                m_FovKick.Setup(m_Camera);
+                m_HeadBob.Setup(m_Camera, 0);
+                m_Jumping = false;
+                m_MouseLook.Init(transform , m_Camera.transform);
+
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Gravity_analog = Physics.gravity;
+
+                //Pause = false;
+                if (canvasGroup != null)
+                {
+                    canvasGroup.alpha = 0f;
+                    canvasGroup.blocksRaycasts = false;
+                }
 
             }
-            
-            m_OriginalCameraPosition = m_Camera.transform.localPosition;
-            m_FovKick.Setup(m_Camera);
-            m_HeadBob.Setup(m_Camera, 0);
-            m_Jumping = false;
-            m_MouseLook.Init(transform , m_Camera.transform);
-
-            Gravity_analog = Physics.gravity;
-
-            //Pause = false;
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 0f;
-                canvasGroup.blocksRaycasts = false;
-            }
-            
 
         }
 
@@ -184,7 +186,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
 
-            if (!is_paused)
+            if (is_paused)
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
@@ -205,7 +207,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 GetComponent<Rigidbody>().freezeRotation = true;
             }
             //v this allows camera motion via mouse
-            if (is_paused)
+            if (!is_paused)
             {
                 RotateView();
             }
