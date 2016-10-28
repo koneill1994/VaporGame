@@ -101,6 +101,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 for (int i = 0; i<g.Length; i++)
                 {
                     g[i].GetComponent<mp_TerminalMenuController>().player_camera = m_Camera;
+                    g[i].GetComponent<Canvas>().worldCamera = m_Camera;
 
                 }
                 

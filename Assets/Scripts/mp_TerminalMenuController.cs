@@ -54,6 +54,8 @@ public class mp_TerminalMenuController : MonoBehaviour {
     }
 
 
+    //the reason you can't click on anything is because the cursor is hidden and/or locked
+
     void ToggleTerminal()
     {
         if (!TerminalActive)
