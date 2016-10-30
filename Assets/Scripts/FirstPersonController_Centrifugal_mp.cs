@@ -337,11 +337,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //get the direction from the normal & the intensity from magnitude fo 
             
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
-
+            //THE FALLING IS SLOWED BECAUSE OF THIS
             if (!is_paused)
             {
                 GetComponent<Rigidbody>().velocity = translation;
             }
+            
+            //(reversing the order doesnt help dont bother)
+            //the first line adds a relative force which will change the velocity over time
+            //the second bit will always set the velocity for that frame to the value of Vector3 translation
+            //negating anything but the first frame's worth of acceleration
+
+
             //Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
