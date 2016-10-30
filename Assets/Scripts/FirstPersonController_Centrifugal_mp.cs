@@ -34,7 +34,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float radius;
         public float jump_force;
 
-        private bool is_paused=false;
+        public bool is_paused=false;
         private Vector3 translation;
 
         public Camera m_Camera;
@@ -335,11 +335,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //this is causing the phantom forces ^^^ ???
             //(floating point error accumulation?)
             //get the direction from the normal & the intensity from magnitude fo 
-
+            
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
 
-            GetComponent<Rigidbody>().velocity = translation;
-
+            if (!is_paused)
+            {
+                GetComponent<Rigidbody>().velocity = translation;
+            }
             //Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
