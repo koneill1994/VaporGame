@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityStandardAssets.Characters.FirstPerson;
+using UnityEngine.EventSystems;
 
 public class mp_TerminalMenuController : NetworkBehaviour
 {
@@ -18,7 +19,7 @@ public class mp_TerminalMenuController : NetworkBehaviour
     public Camera player_camera;
 
     public InputField t_input;
-
+    
     //mp part is still WIP
 
     // Use this for initialization
@@ -69,6 +70,7 @@ public class mp_TerminalMenuController : NetworkBehaviour
                     {
                         player.GetComponent<FirstPersonController_Centrifugal_mp>().is_paused = false;
                         ToggleTerminal();
+                        EventSystem.current.SetSelectedGameObject(null);
                     }
                 }
                 
