@@ -6,9 +6,9 @@ using UnityEngine.UI;
 public class MultiplayerMenuController : MonoBehaviour {
 
     NetworkClient myClient;
-    public CanvasGroup canvasGroup;
+    private CanvasGroup canvasGroup;
     public NetworkManager n_manager;
-    public InputField server_ip;
+    private InputField server_ip;
 
     // Use this for initialization
     void Start () {
@@ -26,6 +26,10 @@ public class MultiplayerMenuController : MonoBehaviour {
     }
 
     //https://stackoverflow.com/questions/36091976/can-i-use-the-unity-networking-hlapi-without-paying-for-the-unity-multiplayer-se
+
+
+    //https://docs.unity3d.com/Manual/UNetSceneObjects.html
+    // ^ this is why the cylinder is gone before anything spawns
 
     public void CreateServer() //this code is called when a player clicks the "create server button
     {
