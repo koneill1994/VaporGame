@@ -34,7 +34,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float radius;
         public float jump_force;
 
-        private bool is_paused=false;
+        public bool is_paused=false;
+        private Vector3 translation;
 
         public Camera m_Camera;
         private bool m_Jump;
@@ -95,23 +96,36 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Camera.gameObject.GetComponent<AudioListener>().enabled = true;
                 //hide visor on self
                 transform.Find("Visor").GetComponent<Renderer>().enabled = false;
-            }
-            
-            m_OriginalCameraPosition = m_Camera.transform.localPosition;
-            m_FovKick.Setup(m_Camera);
-            m_HeadBob.Setup(m_Camera, 0);
-            m_Jumping = false;
-            m_MouseLook.Init(transform , m_Camera.transform);
 
-            Gravity_analog = Physics.gravity;
+                GameObject[] g = GameObject.FindGameObjectsWithTag("terminal");
+                for (int i = 0; i<g.Length; i++)
+                {
+                    g[i].GetComponent<mp_TerminalMenuController>().player_camera = m_Camera;
+                    g[i].GetComponent<Canvas>().worldCamera = m_Camera;
 
-            //Pause = false;
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 0f;
-                canvasGroup.blocksRaycasts = false;
-            }
+                }
+                
             
+
+                m_OriginalCameraPosition = m_Camera.transform.localPosition;
+                m_FovKick.Setup(m_Camera);
+                m_HeadBob.Setup(m_Camera, 0);
+                m_Jumping = false;
+                m_MouseLook.Init(transform , m_Camera.transform);
+
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+
+                Gravity_analog = Physics.gravity;
+
+                //Pause = false;
+                if (canvasGroup != null)
+                {
+                    canvasGroup.alpha = 0f;
+                    canvasGroup.blocksRaycasts = false;
+                }
+
+            }
 
         }
 
@@ -173,7 +187,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
 
-            if (!is_paused)
+            if (is_paused)
             {
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
@@ -194,7 +208,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 GetComponent<Rigidbody>().freezeRotation = true;
             }
             //v this allows camera motion via mouse
-            if (is_paused)
+            if (!is_paused)
             {
                 RotateView();
             }
@@ -232,9 +246,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //myTransform.rotation = Quaternion.Lerp(myTransform.rotation, targetRot, lerpSpeed * Time.deltaTime);
             // move the character forth/back with Vertical axis:
             GetInput(out moveSpeed);
-            Vector3 translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            //translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed, 0, Input.GetAxis("Vertical") * moveSpeed);
+            translation = myTransform.TransformDirection(translation);
             //Debug.Log(moveSpeed);
-            myTransform.Translate(translation);
+            //myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
             //^move to fixed update?
 
@@ -319,11 +335,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //this is causing the phantom forces ^^^ ???
             //(floating point error accumulation?)
             //get the direction from the normal & the intensity from magnitude fo 
-
+            
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
 
-
-
+            if (!is_paused)
+            {
+                GetComponent<Rigidbody>().velocity = translation;
+            }
+            //Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
             //Debug.Log(Gravity_analog.magnitude * GetComponent<Rigidbody>().mass * myNormal);

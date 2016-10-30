@@ -12,6 +12,8 @@ public class TerminalMenuController : MonoBehaviour {
     private CanvasGroup canvasGroup;
     private bool TerminalActive = false;
 
+    public Camera player_camera;
+
     // Use this for initialization
     void Start()
     {
@@ -26,14 +28,17 @@ public class TerminalMenuController : MonoBehaviour {
     // Update is called once per frame
     void Update () {                
         RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //Ray ray = GameObject.FindWithTag("client_cam").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        Ray ray = player_camera.ScreenPointToRay(Input.mousePosition);
         //see if there's a terminal in front of the player
         if (Physics.Raycast(ray, out hit, distanceToItem) && hit.collider.gameObject == gameObject)
         {
+            Debug.Log("RaycastHit");
             //use button is pressed
             if (Input.GetButtonUp("Use"))
             {
                 ToggleTerminal();
+                Debug.Log("HIT");
             }
         }
         Vector3 offset = transform.position - Camera.main.transform.position;
