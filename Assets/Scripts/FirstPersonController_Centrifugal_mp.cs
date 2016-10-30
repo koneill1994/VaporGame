@@ -73,6 +73,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
 
+            reference_frame = GameObject.Find("Inertial_Reference_Frame").transform;
+
             //disable everyone's camera and audio listener
             //they will be enabled ONLY FOR THE CLIENT'S PLAYER MODEL below
             m_Camera.enabled = false;
@@ -124,6 +126,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     canvasGroup.alpha = 0f;
                     canvasGroup.blocksRaycasts = false;
                 }
+
+                if(reference_frame != null)
+                {
+                    transform.SetParent(reference_frame.transform);
+                }
+
 
             }
 
