@@ -42,7 +42,7 @@ public class SkyboxCamera : MonoBehaviour
     {
 
         SkyCamera.transform.position = MainCamera.transform.position;
-        SkyCamera.transform.rotation = MainCamera.transform.rotation;
+        SkyCamera.transform.rotation = MainCamera.transform.localRotation;
         SkyCamera.transform.Rotate(SkyBoxRotation);
     }
 }
