@@ -133,6 +133,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
 
 
+                GameObject c = GameObject.Find("SkyboxCamera");
+                if (c != null)
+                {
+                    c.GetComponent<SkyboxCamera>().MainCamera = m_Camera;
+                }
+
             }
 
         }

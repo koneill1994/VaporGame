@@ -15,6 +15,9 @@ public class SkyboxCamera : MonoBehaviour
     // can be set during game play or in the inspector
     public Vector3 SkyBoxRotation;
 
+
+    public float rot;
+
     // Use this for initialization
     void Start()
     {
@@ -40,9 +43,35 @@ public class SkyboxCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("1: " + MainCamera.transform.rotation);
-        Debug.Log("1" + MainCamera.transform.rotation);
+        Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
+        //Debug.Log("1" + MainCamera.transform.rotation.eulerAngles);
         SkyCamera.transform.rotation = MainCamera.transform.rotation;
-        SkyCamera.transform.Rotate(SkyBoxRotation);
+
+        //SkyCamera.transform.Rotate(SkyCamera.transform.rotation.eulerAngles * -1);
+        //reset rotation to zero every time
+
+        //Vector3 mc = MainCamera.transform.rotation.eulerAngles;
+        //freaks out when you go to far from zero
+
+        //relates to gimbal lock?
+        //https://docs.unity3d.com/Manual/QuaternionAndEulerRotationsInUnity.html
+        //
+
+
+        //SkyCamera.transform.Rotate(mc);
+        
+        //SkyBoxRotation = new Vector3(0,0,rot * Time.deltaTime%360);
+
+        //SkyCamera.transform.rotation = MainCamera.transform.rotation*Quaternion.Euler(SkyBoxRotation);
+
+
+        //SkyCamera.transform.Rotate(SkyBoxRotation);
+        //^^does not rotate from zero, rotates from wherever the thing is already pointing
+        
+        //SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation);
+        //^this is bad, it causes the jittering
+        //all rotation needs to be done via transform.Rotate
+
+
     }
 }
