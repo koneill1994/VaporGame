@@ -486,7 +486,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
-
+            // ^^^ this is causing the jitter
 
             /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS
             ////// MAKE IT LOCAL

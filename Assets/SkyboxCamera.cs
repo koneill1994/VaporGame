@@ -60,7 +60,7 @@ public class SkyboxCamera : MonoBehaviour
         // TODO look into that
 
         //rotate the sun around as well
-        dir_light.transform.rotation = Quaternion.Euler(SkyBoxRotation);
+        dir_light.transform.rotation = Quaternion.Euler(-SkyBoxRotation);
 
     }
 }
