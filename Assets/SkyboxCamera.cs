@@ -40,9 +40,9 @@ public class SkyboxCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        SkyCamera.transform.position = MainCamera.transform.position;
-        SkyCamera.transform.rotation = MainCamera.transform.localRotation;
+        Debug.Log("1: " + MainCamera.transform.rotation);
+        Debug.Log("1" + MainCamera.transform.rotation);
+        SkyCamera.transform.rotation = MainCamera.transform.rotation;
         SkyCamera.transform.Rotate(SkyBoxRotation);
     }
 }
