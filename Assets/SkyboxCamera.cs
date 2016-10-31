@@ -15,6 +15,7 @@ public class SkyboxCamera : MonoBehaviour
     // can be set during game play or in the inspector
     public Vector3 SkyBoxRotation;
 
+    public GameObject dir_light;
 
     public float rot;
 
@@ -44,34 +45,22 @@ public class SkyboxCamera : MonoBehaviour
     void Update()
     {
         Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
-        //Debug.Log("1" + MainCamera.transform.rotation.eulerAngles);
-        SkyCamera.transform.rotation = MainCamera.transform.rotation;
 
-        //SkyCamera.transform.Rotate(SkyCamera.transform.rotation.eulerAngles * -1);
-        //reset rotation to zero every time
+        //determine how much the cylinder has rotated mod 360 since the start
+        SkyBoxRotation = new Vector3(rot * Time.time % 360,0, 0);
 
-        //Vector3 mc = MainCamera.transform.rotation.eulerAngles;
-        //freaks out when you go to far from zero
+        //add that rotation to the rotation due to the player's camera moving
+        SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation)*MainCamera.transform.rotation;
+        // ^ NB: Quaternion multiplication is not transitive (a*b != b*a)
 
-        //relates to gimbal lock?
-        //https://docs.unity3d.com/Manual/QuaternionAndEulerRotationsInUnity.html
-        //
+        //still some jittery fuckery when moving, but a step in the right direction
+        //i think its due to the player not being perfectly upright when moving
+        //it only happens when you move
+        //or after you've picked something up
+        // TODO look into that
 
-
-        //SkyCamera.transform.Rotate(mc);
-        
-        //SkyBoxRotation = new Vector3(0,0,rot * Time.deltaTime%360);
-
-        //SkyCamera.transform.rotation = MainCamera.transform.rotation*Quaternion.Euler(SkyBoxRotation);
-
-
-        //SkyCamera.transform.Rotate(SkyBoxRotation);
-        //^^does not rotate from zero, rotates from wherever the thing is already pointing
-        
-        //SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation);
-        //^this is bad, it causes the jittering
-        //all rotation needs to be done via transform.Rotate
-
+        //rotate the sun around as well
+        dir_light.transform.rotation = Quaternion.Euler(SkyBoxRotation);
 
     }
 }
