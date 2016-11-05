@@ -42,7 +42,7 @@ public class SkyboxCamera : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
 
