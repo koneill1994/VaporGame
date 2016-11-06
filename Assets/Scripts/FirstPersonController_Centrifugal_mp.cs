@@ -332,7 +332,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (reference_frame == null)
             {
-                GetComponent<Rigidbody>().freezeRotation = true;
+                //GetComponent<Rigidbody>().freezeRotation = true;
             }
 
                 //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.

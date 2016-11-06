@@ -44,21 +44,15 @@ public class SkyboxCamera : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
+        //Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
 
         //determine how much the cylinder has rotated mod 360 since the start
         SkyBoxRotation = new Vector3(rot * Time.time % 360,0, 0);
 
         //add that rotation to the rotation due to the player's camera moving
         SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation)*MainCamera.transform.rotation;
-        // ^ NB: Quaternion multiplication is not transitive (a*b != b*a)
-
-        //still some jittery fuckery when moving, but a step in the right direction
-        //i think its due to the player not being perfectly upright when moving
-        //it only happens when you move
-        //or after you've picked something up
-        // TODO look into that
-
+        // ^ NB: Quaternion multiplication is not commutative (a*b != b*a)
+        
         //rotate the sun around as well
         dir_light.transform.rotation = Quaternion.Euler(-SkyBoxRotation);
 
