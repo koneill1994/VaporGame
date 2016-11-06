@@ -8,8 +8,10 @@ public class RandomCubeSpawner : NetworkBehaviour {
     public float length;
     public int NumberOfCubes;
     
-    public float MinimumCubeDimension;
-    public float MaximumCubeDimension;
+    public Vector2 MinMaxCubeWidth;   //cubes will be larger than first value and smaller than second value
+    public Vector2 MinMaxCubeHeight;
+
+    public float Offset;
 
     public GameObject TerrainCube;
 
@@ -18,23 +20,19 @@ public class RandomCubeSpawner : NetworkBehaviour {
     void Start () {
         if (isServer)
         {
-            if (MinimumCubeDimension>=MaximumCubeDimension)
-            {
-                //make sure minimum is less than or equal to maximum
-                MinimumCubeDimension = MaximumCubeDimension;
-            }
-            //if either are less than or equal to zero, set to 1
-            MinimumCubeDimension = (MinimumCubeDimension <= 0) ? 1F : MinimumCubeDimension;
-            MaximumCubeDimension = (MaximumCubeDimension <= 0) ? 1F : MaximumCubeDimension;
+            MinMaxCubeWidth = SanitizeMinMax(MinMaxCubeWidth);
+            MinMaxCubeHeight = SanitizeMinMax(MinMaxCubeHeight);
 
-            for(int n=0; n < NumberOfCubes; n++)
+            for (int n=0; n < NumberOfCubes; n++)
             {
                 //get together all our variables used to place the cubes
                 float l = Random.Range(-length / 2, length/2);
-                float phi = Random.Range(0, 360);
-                float theta = phi % 30 + Mathf.Floor(phi / 3) * 60;
-                Vector3 coords = RadialToCartesian(l, theta, radius);
-                Vector3 scale = new Vector3(Random.Range(MinimumCubeDimension, MaximumCubeDimension), Random.Range(MinimumCubeDimension, MaximumCubeDimension), Random.Range(MinimumCubeDimension, MaximumCubeDimension));
+                float phi = Random.Range(0, 180);
+                float theta = phi % 60 + Mathf.Floor(phi / 60)*120;
+                theta += Offset;
+                Vector3 scale = new Vector3(Random.Range(MinMaxCubeWidth.x, MinMaxCubeWidth.y), Random.Range(MinMaxCubeHeight.x, MinMaxCubeHeight.y), Random.Range(MinMaxCubeWidth.x, MinMaxCubeWidth.y));
+                Vector3 coords = RadialToCartesian(l, theta, radius, scale.y);
+                
                                 
                 //network instantiate
                 GameObject g = (GameObject) Instantiate(TerrainCube, coords, Quaternion.Euler(theta,0,0));
@@ -55,13 +53,28 @@ public class RandomCubeSpawner : NetworkBehaviour {
 	
 	}
 
-    public Vector3 RadialToCartesian(float l, float theta, float radius)
+    public Vector2 SanitizeMinMax(Vector2 MinMax)
+    {
+
+        if (MinMax.x >= MinMax.y)
+        {
+            //make sure minimum is less than or equal to maximum
+            MinMax.x = MinMax.y;
+        }
+        //if either are less than or equal to zero, set to 1
+        MinMax.x = (MinMax.x <= 0) ? 1F : MinMax.x;
+        MinMax.y = (MinMax.y <= 0) ? 1F : MinMax.y;
+
+        return MinMax;
+    }
+
+    public Vector3 RadialToCartesian(float l, float theta, float radius, float height)
     {
         //assuming length is down X axis
         Vector3 loc = new Vector3(0, 0, 0);
         loc.x = l;
-        loc.y = Mathf.Cos(Mathf.Rad2Deg * theta) * radius;
-        loc.z = Mathf.Sin(Mathf.Rad2Deg * theta) * radius;
+        loc.y = Mathf.Cos(Mathf.Deg2Rad * theta) * (radius-height/2);
+        loc.z = Mathf.Sin(Mathf.Deg2Rad * theta) * (radius-height/2);
 
         return loc;
     }

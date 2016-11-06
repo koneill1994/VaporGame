@@ -53,10 +53,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             yRotSum += yRot;
             yRotSum = Mathf.Repeat(yRotSum, 360);
             character.localEulerAngles = rotation;
-            //character.Rotate(Vector3.up, yRotSum);
+            
             character.rotation *= Quaternion.Euler(Vector3.up * yRotSum);
-            // ^^  this causes the jitter
-            // find some way to do it with just quaternions
 
             camera.localRotation = m_CameraTargetRot;
             //}
