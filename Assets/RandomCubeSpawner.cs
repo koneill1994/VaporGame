@@ -3,6 +3,18 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
+public struct RandomCube
+{
+    public GameObject obj;
+    //constructor
+    public RandomCube(GameObject obj)
+    {
+        this.obj = obj;
+    }
+
+}
+
+public class SyncListRandomCube : SyncListStruct<RandomCube> { }
 
 
 public class RandomCubeSpawner : NetworkBehaviour {
@@ -18,19 +30,30 @@ public class RandomCubeSpawner : NetworkBehaviour {
 
     public GameObject TerrainCube;
 
+    public SyncListRandomCube CubeList = new SyncListRandomCube();
 
-    public List<GameObject> CubeList = new List<GameObject>();
+    //OKAY NEW PLAN
+    //have the server generate the seed
+    //and send it to all the clients via RPC or syncvar so that they can make it themselves
 
-    public void OnStartClient()
+    //public List<GameObject> CubeList = new List<GameObject>();
+
+    //This code isn't even being run at all
+    //I wonder why that is?
+    public override void OnStartClient()
     {
-        foreach(GameObject g in CubeList)
+        Debug.Log("Client Started");
+        Debug.Log(string.Concat("Cube count:", CubeList.Count));
+        foreach (RandomCube g in CubeList)
         {
-            ClientScene.RegisterPrefab(g);
+            Debug.Log(string.Concat("Registering cube ID", g.obj.GetInstanceID()));
+            ClientScene.RegisterPrefab(g.obj);
         }
     }
 
     // Use this for initialization
     void Start () {
+        Debug.Log("Starting Cube Spawner");
         if (isServer)
         {
             MinMaxCubeWidth = SanitizeMinMax(MinMaxCubeWidth);
@@ -52,8 +75,10 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 g.transform.localScale = scale;
                 g.transform.parent = transform;
                 
-                //NetworkServer.Spawn(g);
-                CubeList.Add(g);
+                RandomCube m = new RandomCube(g);
+                //m.obj = g;
+
+                CubeList.Add(m);
                 //^^ this is throwing an error at the first one
                 // but still adds it to the list -_-
                 //figure out how to suppress the error so it goes through the whole thing
@@ -67,7 +92,7 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 cube.obj = g;
                 */
 
-                Debug.Log(string.Concat("Cube number ", n, "spawned"));
+                Debug.Log(string.Concat("Cube number ", n, " spawned"));
             }
 
 
