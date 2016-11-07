@@ -3,6 +3,10 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
+public struct RandomCube
+{
+    public GameObject obj;
+}
 
 public class RandomCubeSpawner : NetworkBehaviour {
     
@@ -16,14 +20,15 @@ public class RandomCubeSpawner : NetworkBehaviour {
     public float Offset;
 
     public GameObject TerrainCube;
+    
 
-    public List<GameObject> CubeList;
-
+    public SyncListStruct<RandomCube> CubeList;
+    
     public void OnStartClient()
     {
-        foreach (GameObject g in CubeList)
+        foreach(RandomCube g in CubeList)
         {
-            ClientScene.RegisterPrefab(g);
+            ClientScene.RegisterPrefab(g.obj);
         }
     }
 
@@ -50,7 +55,10 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 g.transform.localScale = scale;
                 g.transform.parent = transform;
                 //NetworkServer.Spawn(g);
-                CubeList.Add(g);
+
+                RandomCube cube = new RandomCube();
+                cube.obj = g;
+                CubeList.Add(cube);
                 Debug.Log(n);
             }
 
