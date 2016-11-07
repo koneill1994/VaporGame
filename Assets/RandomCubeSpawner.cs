@@ -2,11 +2,8 @@
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
-/*
-public struct RandomCube
-{
-    public GameObject obj;
-}*/
+
+
 
 public class RandomCubeSpawner : NetworkBehaviour {
     
@@ -20,10 +17,10 @@ public class RandomCubeSpawner : NetworkBehaviour {
     public float Offset;
 
     public GameObject TerrainCube;
-    
 
-    public List<GameObject> CubeList;
-    
+
+    public List<GameObject> CubeList = new List<GameObject>();
+
     public void OnStartClient()
     {
         foreach(GameObject g in CubeList)
@@ -57,6 +54,14 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 
                 //NetworkServer.Spawn(g);
                 CubeList.Add(g);
+                //^^ this is throwing an error at the first one
+                // but still adds it to the list -_-
+                //figure out how to suppress the error so it goes through the whole thing
+
+                //still though, players should be given all the existent network identity objects when they spawn
+                //at least i think so
+                //so this workaround shouldn't be necessary anyway >:I
+
                 /*
                 RandomCube cube = new RandomCube();
                 cube.obj = g;
