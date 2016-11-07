@@ -1,7 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+guid: c16e3ea1fb7ad404b81154c7792706df
+folderAsset: yes
+timeCreated: 1478478056
+=======
 guid: cf47dd1fab4ca7d4e8adf6d3dbabf170
 folderAsset: yes
 timeCreated: 1478475618
+>>>>>>> refs/remotes/koneill1994/master
 licenseType: Free
 DefaultImporter:
   userData: 

@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
+guid: 3f09556171e56394bbc191da3e4b911a
+timeCreated: 1478478323
+=======
 guid: edb3a589d3dd57b458dde889f906e888
 timeCreated: 1478475637
+>>>>>>> refs/remotes/koneill1994/master
 licenseType: Free
 AudioImporter:
   serializedVersion: 6
