@@ -3,22 +3,10 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
-public struct RandomCube
-{
-    public GameObject obj;
-    //constructor
-    public RandomCube(GameObject obj)
-    {
-        this.obj = obj;
-    }
-
-}
-
-public class SyncListRandomCube : SyncListStruct<RandomCube> { }
-
-
 public class RandomCubeSpawner : NetworkBehaviour {
     
+
+
     public float radius;
     public float length;
     public int NumberOfCubes;
@@ -30,32 +18,20 @@ public class RandomCubeSpawner : NetworkBehaviour {
 
     public GameObject TerrainCube;
 
-    public SyncListRandomCube CubeList = new SyncListRandomCube();
+    [SyncVar]
+    public int seed;
 
     //OKAY NEW PLAN
     //have the server generate the seed
     //and send it to all the clients via RPC or syncvar so that they can make it themselves
 
-    //public List<GameObject> CubeList = new List<GameObject>();
-
-    //This code isn't even being run at all
-    //I wonder why that is?
-    public override void OnStartClient()
-    {
-        Debug.Log("Client Started");
-        Debug.Log(string.Concat("Cube count:", CubeList.Count));
-        foreach (RandomCube g in CubeList)
-        {
-            Debug.Log(string.Concat("Registering cube ID", g.obj.GetInstanceID()));
-            ClientScene.RegisterPrefab(g.obj);
-        }
-    }
-
     // Use this for initialization
     void Start () {
         Debug.Log("Starting Cube Spawner");
-        if (isServer)
-        {
+        //if (isServer)
+        //{
+
+        Random.InitState(seed);
             MinMaxCubeWidth = SanitizeMinMax(MinMaxCubeWidth);
             MinMaxCubeHeight = SanitizeMinMax(MinMaxCubeHeight);
 
@@ -75,30 +51,18 @@ public class RandomCubeSpawner : NetworkBehaviour {
                 g.transform.localScale = scale;
                 g.transform.parent = transform;
                 
-                RandomCube m = new RandomCube(g);
-                //m.obj = g;
 
-                CubeList.Add(m);
                 //^^ this is throwing an error at the first one
                 // but still adds it to the list -_-
                 //figure out how to suppress the error so it goes through the whole thing
 
-                //still though, players should be given all the existent network identity objects when they spawn
-                //at least i think so
-                //so this workaround shouldn't be necessary anyway >:I
-
-                /*
-                RandomCube cube = new RandomCube();
-                cube.obj = g;
-                */
 
                 Debug.Log(string.Concat("Cube number ", n, " spawned"));
             }
 
 
             
-        }
-        //Network.Instantiate(TerrainCube, transform.position, Quaternion.Euler(0, 0, 0), 0);
+        //}
     }
 	
 	// Update is called once per frame
