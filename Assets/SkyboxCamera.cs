@@ -3,7 +3,7 @@ using System.Collections;
 
 public class SkyboxCamera : MonoBehaviour
 {
-
+    
 
     // set the main camera in the inspector
     public Camera MainCamera;
@@ -19,9 +19,12 @@ public class SkyboxCamera : MonoBehaviour
 
     public float rot;
 
+    private Quaternion sunangle; //set to rotation at beginning
+
     // Use this for initialization
     void Start()
     {
+        sunangle = dir_light.transform.rotation;
         if (SkyCamera.depth >= MainCamera.depth)
         {
             Debug.Log("Set skybox camera depth lower " +
@@ -52,9 +55,9 @@ public class SkyboxCamera : MonoBehaviour
         //add that rotation to the rotation due to the player's camera moving
         SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation)*MainCamera.transform.rotation;
         // ^ NB: Quaternion multiplication is not commutative (a*b != b*a)
-        
+
         //rotate the sun around as well
-        dir_light.transform.rotation = Quaternion.Euler(-SkyBoxRotation);
+        dir_light.transform.rotation = Quaternion.Euler(-SkyBoxRotation) * sunangle;
 
     }
 }

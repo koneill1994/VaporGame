@@ -231,11 +231,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // add coriolis (i.e. disble forces and parentage when object/player not on ground)
 
             //to stop drifting when no input
+            /*
             if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0 || freeze_velocity)
             {
                 Vector3 oldvelocity = GetComponent<Rigidbody>().velocity;
                 GetComponent<Rigidbody>().velocity = new Vector3(0, oldvelocity.y, 0);
-            }
+            }*/
             
             Ray ray;
             RaycastHit hit;
@@ -354,9 +355,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //THE FALLING IS SLOWED BECAUSE OF THIS
             if (!is_paused)
             {
+                //GetComponent<Rigidbody>().velocity = new Vector3(translation.x, GetComponent<Rigidbody>().velocity.y, translation.z);
                 GetComponent<Rigidbody>().velocity = translation;
             }
-            
+
             //(reversing the order doesnt help dont bother)
             //the first line adds a relative force which will change the velocity over time
             //the second bit will always set the velocity for that frame to the value of Vector3 translation
