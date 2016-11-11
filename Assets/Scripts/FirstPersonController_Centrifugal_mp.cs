@@ -337,10 +337,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
                 //Add a check for isLocalPlayer in the Update function, so that only the local player processes input.
-            if (!isLocalPlayer)
-            {
-                return;
-            }
+
             float GravityAtRadius = 9.81F;
 
             //Vector3 centrifugal_force = new Vector3(0, transform.position.y - reference_frame.transform.position.y, transform.position.z - reference_frame.transform.position.z);
@@ -352,6 +349,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //get the direction from the normal & the intensity from magnitude fo 
             
             GetComponent<Rigidbody>().AddRelativeForce(Vector3.down * GravityAtRadius);
+
+            if (!isLocalPlayer)
+            {
+                return;
+            }
+
             //THE FALLING IS SLOWED BECAUSE OF THIS
             if (!is_paused)
             {
