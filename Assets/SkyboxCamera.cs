@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class SkyboxCamera : MonoBehaviour
+
+public class SkyboxCamera : NetworkBehaviour
 {
     
 
@@ -19,11 +21,17 @@ public class SkyboxCamera : MonoBehaviour
 
     public float rot;
 
+    [SyncVar]
+    private float server_t;
+
+    private float client_t;
+
     private Quaternion sunangle; //set to rotation at beginning
 
     // Use this for initialization
     void Start()
     {
+        client_t = server_t;
         sunangle = dir_light.transform.rotation;
         if (SkyCamera.depth >= MainCamera.depth)
         {
@@ -47,10 +55,14 @@ public class SkyboxCamera : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if (isServer)
+        {
+            server_t = Time.time;
+        }
         //Debug.Log("1: " + MainCamera.transform.rotation.eulerAngles);
 
         //determine how much the cylinder has rotated mod 360 since the start
-        SkyBoxRotation = new Vector3(rot * Time.time % 360,0, 0);
+        SkyBoxRotation = new Vector3(rot * (client_t+Time.time) % 360,0, 0);
 
         //add that rotation to the rotation due to the player's camera moving
         SkyCamera.transform.rotation = Quaternion.Euler(SkyBoxRotation)*MainCamera.transform.rotation;
