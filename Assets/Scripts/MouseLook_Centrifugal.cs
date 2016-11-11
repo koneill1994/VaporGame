@@ -55,6 +55,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             UpdateCursorLock();
         }
 
+        //todo add a smoothing (ie lerp) thing you can toggle
+        //to get a more cinematic look (for making videos of it)
+
         public void SetCursorLock(bool value)
         {
             lockCursor = value;
