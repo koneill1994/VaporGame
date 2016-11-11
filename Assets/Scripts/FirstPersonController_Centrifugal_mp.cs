@@ -222,10 +222,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 GetComponent<Rigidbody>().freezeRotation = true;
             }
             //v this allows camera motion via mouse
-            if (!is_paused)
-            {
-                RotateView();
-            }
+            //as well as rotation due to centrifugal force
+            RotateView();
+
+
             //TO DO LIST
             // reenable + debug additional functionality of script
             // add coriolis (i.e. disble forces and parentage when object/player not on ground)
@@ -484,19 +484,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
+           m_MouseLook.LookRotation(transform, m_Camera.transform, rotation, is_paused);
 
-            if (!isLocalPlayer)
-            {
-                return;
-            }
-
-            m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
-            // ^^^ this is causing the jitter
-
-            /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS
-            ////// MAKE IT LOCAL
-
-
+            //this handles both "rotation due to mouse movement"
+            //and "rotation due to position in cylinder"
+            // mouse movement one needs to be disabled while paused
+            //while cylinder position must not
         }
 
         /*

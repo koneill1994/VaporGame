@@ -364,7 +364,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         
         private void RotateView()
         {
-            m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
+            Debug.Log("This script (FirstPersonController_Centrifugal.cs) is obsolete, Use FirstPersonController_Centrifugal_mp.cs");
+            //m_MouseLook.LookRotation (transform, m_Camera.transform, rotation);
+            //======================
+            //THIS SCRIPT HAS BEEN SUPERSEDED BY
+            //
+            //          FirstPersonController_Centrifugal_mp.cs
+            //
+            //There's no point for me to go to the effort to change this, just use that one
+            //======================
+            //-KO
 
 
             /////^^^ THIS LOCKS THE COLLIDER TO THE WORLD Y AXIS

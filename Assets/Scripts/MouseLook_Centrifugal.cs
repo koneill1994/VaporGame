@@ -29,7 +29,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        public void LookRotation(Transform character, Transform camera, Vector3 rotation)
+        public void LookRotation(Transform character, Transform camera, Vector3 rotation, bool is_paused)
         {
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
@@ -49,14 +49,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             else
             {*/
+            if (!is_paused)
+            {
+                yRotSum += yRot;
+                yRotSum = Mathf.Repeat(yRotSum, 360);
+                camera.localRotation = m_CameraTargetRot;
+            }
 
-            yRotSum += yRot;
-            yRotSum = Mathf.Repeat(yRotSum, 360);
             character.localEulerAngles = rotation;
-            
-            character.rotation *= Quaternion.Euler(Vector3.up * yRotSum);
 
-            camera.localRotation = m_CameraTargetRot;
+            character.rotation *= Quaternion.Euler(Vector3.up * yRotSum);
             //}
 
             UpdateCursorLock();
