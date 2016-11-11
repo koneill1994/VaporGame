@@ -96,7 +96,21 @@ public class RandomCubeSpawner : NetworkBehaviour {
         return loc;
     }
 
+    public int StringToInt(string str)
+    {
+        int output = 0;
+        int i = 0;
+        foreach (char c in str)
+        {
+            output += Mathf.Min(System.Convert.ToInt32(c),127) * (int)Mathf.Pow(128, i);
+            i++;
+        }
+        return output;
+    }
 
-
+    public void SetSeed(string input)
+    {
+        seed = StringToInt(input);
+    }
 
 }

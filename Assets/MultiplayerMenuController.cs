@@ -8,13 +8,19 @@ public class MultiplayerMenuController : MonoBehaviour {
     NetworkClient myClient;
     private CanvasGroup canvasGroup;
     public NetworkManager n_manager;
+    public RandomCubeSpawner cubespawner;
+
     private InputField server_ip;
+    private InputField seed_input;
+
 
     // Use this for initialization
     void Start () {
         canvasGroup = GetComponent<CanvasGroup>();
         server_ip = canvasGroup.gameObject.transform.Find("server_ip").GetComponent<InputField>();
-	}
+        seed_input = canvasGroup.gameObject.transform.Find("seed_input").GetComponent<InputField>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -36,8 +42,15 @@ public class MultiplayerMenuController : MonoBehaviour {
         n_manager.networkAddress = "localhost";
         n_manager.networkPort = 7777;
         //create the server
-        //join the server
 
+        //set the seed
+        if (seed_input.text.Length > 0)
+        {
+            cubespawner.SetSeed(seed_input.text);
+        }
+        
+        
+        //join the server
         n_manager.StartHost();
 
         canvasGroup.alpha = 0f;
@@ -50,9 +63,6 @@ public class MultiplayerMenuController : MonoBehaviour {
         n_manager.networkPort = 7777;
 
         n_manager.StartClient();
-
-
-        
     }
 
 }
