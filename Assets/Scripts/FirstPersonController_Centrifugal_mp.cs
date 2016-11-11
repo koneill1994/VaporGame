@@ -36,6 +36,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public bool is_paused=false;
         private Vector3 translation;
+        private Vector3 acceleration;
 
         public Camera m_Camera;
         private bool m_Jump;
@@ -266,8 +267,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (!is_paused)
             {
                 translation = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, 0, Input.GetAxis("Vertical") * moveSpeed);
-                translation = myTransform.TransformDirection(translation);
+                acceleration = new Vector3(Input.GetAxis("Horizontal") * 100F, 0, Input.GetAxis("Vertical") * 100F);
             }
+            translation = myTransform.TransformDirection(translation);
+            acceleration = myTransform.TransformDirection(acceleration);
             //Debug.Log(moveSpeed);
             //myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
@@ -363,7 +366,36 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (!is_paused)
             {
                 //GetComponent<Rigidbody>().velocity = new Vector3(translation.x, GetComponent<Rigidbody>().velocity.y, translation.z);
-                GetComponent<Rigidbody>().velocity = translation;
+
+                GetComponent<Rigidbody>().velocity = translation;//comment this out to test the below code
+
+                //THIS IS THE BETTER MOVEMENT CODE WIP
+                //UNCOMMENT AT YOUR OWN PERIL
+                /*
+                if (isGroundedCustom)
+                {
+                    float correct_speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
+                    //if walking set correct speed to walkspeed
+                    //else set to run speed
+                    if (acceleration.magnitude > 0)
+                    {
+                        if (GetComponent<Rigidbody>().velocity.magnitude < correct_speed)
+                        {
+                            GetComponent<Rigidbody>().AddRelativeForce(acceleration, ForceMode.Acceleration);
+                        }
+                    }
+                    else
+                    {
+                        GetComponent<Rigidbody>().AddRelativeForce(-GetComponent<Rigidbody>().velocity, ForceMode.Acceleration);
+                    }
+
+
+                }
+
+
+                */
+
+
             }
 
             //(reversing the order doesnt help dont bother)
