@@ -33,24 +33,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
-            
-            //m_CharacterTargetRot *= Quaternion.Euler (0f, yRot, 0f);
-            m_CameraTargetRot *= Quaternion.Euler (-xRot, 0f, 0f);
 
-            if(clampVerticalRotation)
-                m_CameraTargetRot = ClampRotationAroundXAxis (m_CameraTargetRot);
-            /*
-            if(smooth)
-            {
-                character.localRotation = Quaternion.Slerp (character.localRotation, m_CharacterTargetRot,
-                    smoothTime * Time.deltaTime);
-                camera.localRotation = Quaternion.Slerp (camera.localRotation, m_CameraTargetRot,
-                    smoothTime * Time.deltaTime);
-            }
-            else
-            {*/
+            //m_CharacterTargetRot *= Quaternion.Euler (0f, yRot, 0f);
             if (!is_paused)
             {
+                m_CameraTargetRot *= Quaternion.Euler (-xRot, 0f, 0f);
+
+                if(clampVerticalRotation)
+                    m_CameraTargetRot = ClampRotationAroundXAxis (m_CameraTargetRot);
+
+
                 yRotSum += yRot;
                 yRotSum = Mathf.Repeat(yRotSum, 360);
                 camera.localRotation = m_CameraTargetRot;
@@ -59,7 +51,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             character.localEulerAngles = rotation;
 
             character.rotation *= Quaternion.Euler(Vector3.up * yRotSum);
-            //}
 
             UpdateCursorLock();
         }
