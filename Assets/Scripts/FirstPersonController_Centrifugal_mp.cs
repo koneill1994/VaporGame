@@ -262,8 +262,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             // move the character forth/back with Vertical axis:
             GetInput(out moveSpeed);
             //translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
-            translation = new Vector3 (Input.GetAxis("Horizontal") * moveSpeed, 0, Input.GetAxis("Vertical") * moveSpeed);
-            translation = myTransform.TransformDirection(translation);
+
+            if (!is_paused)
+            {
+                translation = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, 0, Input.GetAxis("Vertical") * moveSpeed);
+                translation = myTransform.TransformDirection(translation);
+            }
             //Debug.Log(moveSpeed);
             //myTransform.Translate(translation);
             //Debug.DrawLine(transform.position, (transform.position + translation), Color.red);
@@ -367,7 +371,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
             //the second bit will always set the velocity for that frame to the value of Vector3 translation
             //negating anything but the first frame's worth of acceleration
 
-
+            //IDEA FOR FIXING
+            //wasd will apply an acceleration along relevant axis
+            //until player has reached max speed (for either running or walking)
+            //when grounded, slow to zero when button not pressed
+            
             //Debug.Log(GetComponent<Rigidbody>().velocity);
             // apply constant weight force according to character normal:
             //GetComponent<ConstantForce>().force = (Gravity_analog * GetComponent<Rigidbody>().mass);
