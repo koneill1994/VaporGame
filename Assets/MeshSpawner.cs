@@ -18,14 +18,14 @@ public class MeshSpawner : MonoBehaviour {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         mesh.vertices = MakeVertices(width, height);
-        //mesh.uv = newUV;
+        mesh.uv = MakeUVs(mesh.vertices,width,height);
         mesh.triangles = MakeTriangles(mesh.vertices,width,height);
 
-
+        mesh.RecalculateNormals();
         GetComponent<MeshCollider>().sharedMesh = mesh;
 
     }
-	
+
     /*
      OK so here's how this goes
      
@@ -38,9 +38,6 @@ public class MeshSpawner : MonoBehaviour {
         
         make and spawn a mesh of arbitrary size, with height determined by a procgen simplex noise algorithm
         //done!
-        //look into mesh.uv and setting a procedural color
-        //figure out why the texture is so screwed up
-        //
 
         PHASE 3
 
@@ -66,6 +63,19 @@ public class MeshSpawner : MonoBehaviour {
             }
         }
         return list;
+    }
+
+    Vector2[] MakeUVs(Vector3[] verts, int width, int height)
+    {
+        Vector2[] uvs = new Vector2[verts.Length];
+        for(int n=0; n<verts.Length; n++)
+        {
+            //i * height + j = num
+            // i = (num-j)/
+            uvs[n] = new Vector2(n%width, Mathf.Floor(n/width));
+        }
+
+        return uvs;
     }
 
     int[] MakeTriangles(Vector3[] verts, int width, int height)
