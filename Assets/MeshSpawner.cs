@@ -6,12 +6,10 @@ public class MeshSpawner : MonoBehaviour {
     public int width;
     public int height;
 
+    public float heightscale;
 
-
-
-    public Vector3[] newVertices;
-    public Vector2[] newUV;
-    public int[] newTriangles;
+    public float NoiseScale;
+    public Vector2 NoiseOffset;
 
     private Mesh mesh;
 
@@ -19,14 +17,13 @@ public class MeshSpawner : MonoBehaviour {
     void Start () {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        //mesh.vertices = newVertices;
         mesh.vertices = MakeVertices(width, height);
         //mesh.uv = newUV;
         mesh.triangles = MakeTriangles(mesh.vertices,width,height);
 
 
+        GetComponent<MeshCollider>().sharedMesh = mesh;
 
-        Instantiate(mesh);
     }
 	
     /*
@@ -35,29 +32,24 @@ public class MeshSpawner : MonoBehaviour {
         PHASE 1
         
         make and spawn a mesh with an arbitrary number of coordinates
-        
+        //done!
+
         PHASE 2
         
         make and spawn a mesh of arbitrary size, with height determined by a procgen simplex noise algorithm
+        //done!
+        //look into mesh.uv and setting a procedural color
+        //figure out why the texture is so screwed up
+        //
 
         PHASE 3
 
         make and spawn a mesh of arbitrary size, which has a simplex noise esque landscape (periodic), curved around the inside of a cylinder
+
+
                    */
 
 
-
-
-    void OnDrawGizmos()
-    {
-        if (mesh != null)
-        {
-            foreach (Vector3 p in mesh.vertices)
-            {
-                Gizmos.DrawIcon(p, "pixels.png", true);
-            }
-        }
-    }
 
     Vector3[] MakeVertices(int width, int height)
     {
@@ -66,7 +58,11 @@ public class MeshSpawner : MonoBehaviour {
         {
             for(int j = 0; j < height; j++)
             {
-                list[i * height + j] = new Vector3(i, 0, j);
+                float h = 0;
+                h = Mathf.PerlinNoise(NoiseOffset.x + (float)i / (float)width * NoiseScale, NoiseOffset.y + (float)j / (float)height * NoiseScale) * heightscale;
+                list[i * height + j] = new Vector3(i, h, j);
+                //Debug.Log(h);
+                //Debug.Log(new Vector2((float)i / (float)width * (float)NoiseScale, (float)j / (float)height * (float)NoiseScale));
             }
         }
         return list;
