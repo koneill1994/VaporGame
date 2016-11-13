@@ -232,12 +232,12 @@ public class MeshSpawner : MonoBehaviour {
         float output = 0;
         foreach(float m in octaves)
         {
-            float i = NoiseOffset.x + ((float)x / (float)width) * NoiseScale / m;
-            float j = NoiseOffset.y + ((float)y / (float)height) * NoiseScale / m;
+            float i = 0.5F+NoiseOffset.x + ((float)x) * NoiseScale / m;
+            float j = 0.5F+NoiseOffset.y + ((float)y) * NoiseScale / m;
             //Debug.Log(new Vector2(i, j));
             //Debug.Log(Mathf.PerlinNoise(i, j) * heightscale / m);
-            output += Mathf.PerlinNoise(i,j) * heightscale / m;
-
+            output += Mathf.PerlinNoise(i,j) * heightscale * m;
+            //Remember: perlin noise always returns 0.5 for integer arguments
         }
         //Debug.Log(output);
         return output;
