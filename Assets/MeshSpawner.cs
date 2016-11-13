@@ -17,6 +17,8 @@ public class MeshSpawner : MonoBehaviour {
     public float NoiseScale;    //multiplies to scale the noise; larger number is finer noise
     public Vector2 NoiseOffset; //randomize values to get different noisemaps; basically translates the noisemap presented to get different noise
 
+    public float[] octaves;
+
     private Mesh mesh;
     
     void Start () {
@@ -32,7 +34,7 @@ public class MeshSpawner : MonoBehaviour {
         else
         {
             mesh.vertices = MakeVerticesCylinder(length, radius, VertexSep);
-
+            mesh.uv = MakeUVsCylinder(mesh.vertices, length, radius);
             mesh.triangles = MakeTrianglesCylinder(mesh.vertices, length, radius);
             Debug.Log(mesh.vertices.Length);
         }
@@ -58,7 +60,17 @@ public class MeshSpawner : MonoBehaviour {
         PHASE 3
 
         make and spawn a mesh of arbitrary size, which has a simplex noise esque landscape (periodic), curved around the inside of a cylinder
+        //done!
 
+
+        issues:
+        - knit cylinder together at the top
+            - periodic perlin noise?
+        - can't add in a scale factor smaller than one
+            - noise just keeps getting smaller and smaller (we want big noise)
+            - figure out why that is
+        - performance enhancements
+            -generate it all in the same loop
 
                    */
 
@@ -152,7 +164,7 @@ public class MeshSpawner : MonoBehaviour {
             {
                 float h = 0;
                 h = PerlinOctaves(i, j);
-                list[i * height + j] = RadialToCartesian(j, i*360/width, radius, h);
+                list[i * height + j] = RadialToCartesian(j*length/height, i*360/width, radius, h);
             }
         }
         return list;
@@ -195,15 +207,34 @@ public class MeshSpawner : MonoBehaviour {
         return Triangles;
     }
 
+    Vector2[] MakeUVsCylinder(Vector3[] verts, float length, float radius)
+    {
+        int width = Mathf.CeilToInt(2 * Mathf.PI * radius / VertexSep);   //wrong axis may cause something wonky, we'll see heh
+        int height = Mathf.CeilToInt(length / VertexSep);
+        Vector2[] uvs = new Vector2[verts.Length];
+        for (int n = 0; n < verts.Length; n++)
+        {
+            uvs[n] = new Vector2(n % width, Mathf.Floor(n / width));
+        }
+
+        return uvs;
+    }
 
 
     float PerlinOctaves(int x, int y)
     {
-        //layering different scales of noise to produce large- and small-scale terrain (hills vs bumps)
-        float one = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale, NoiseOffset.y + ((float)y / (float)height) * NoiseScale) * heightscale;
-        float two = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale*2, NoiseOffset.y + ((float)y / (float)height) * NoiseScale*2) * heightscale*2;
-        float three = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale*4, NoiseOffset.y + ((float)y / (float)height) * NoiseScale*4) * heightscale*4;
-        return one + two + three;
+        float output = 0;
+        foreach(float m in octaves)
+        {
+            float i = NoiseOffset.x + ((float)x / (float)width) * NoiseScale / m;
+            float j = NoiseOffset.y + ((float)y / (float)height) * NoiseScale / m;
+            //Debug.Log(new Vector2(i, j));
+            //Debug.Log(Mathf.PerlinNoise(i, j) * heightscale / m);
+            output += Mathf.PerlinNoise(i,j) * heightscale / m;
+
+        }
+        //Debug.Log(output);
+        return output;
     }
 
                                      //z      //x          //radius     //y
