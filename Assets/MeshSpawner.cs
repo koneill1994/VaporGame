@@ -62,6 +62,12 @@ public class MeshSpawner : MonoBehaviour {
         make and spawn a mesh of arbitrary size, which has a simplex noise esque landscape (periodic), curved around the inside of a cylinder
         //done!
 
+        PHASE 4
+
+        split it up into sections (i.e. chunks) with differing levels of detail for each
+            performance enhancements
+                -only nearby chunks have total detail
+                    -more distant chunks are less detailed, so fewer polygons to render && multithreading (hopefully) so we don't have to wait for all of them to render to begin
 
         issues:
         - knit cylinder together at the top
