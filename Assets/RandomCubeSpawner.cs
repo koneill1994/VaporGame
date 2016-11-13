@@ -38,9 +38,9 @@ public class RandomCubeSpawner : NetworkBehaviour {
             for (int n=0; n < NumberOfCubes; n++)
             {
                 //get together all our variables used to place the cubes
-                float l = Random.Range(-length / 2, length/2);
-                float phi = Random.Range(0, 180);
-                float theta = phi % 60 + Mathf.Floor(phi / 60)*120;
+                float l = Random.Range(-length / 2, length/2);  //position down the length of the cylinder
+                float phi = Random.Range(0, 180);                       
+                float theta = phi % 60 + Mathf.Floor(phi / 60)*120;     //position along the inner circumference (weird because we're skipping over half the space within the cylinder)
                 theta += Offset;
                 Vector3 scale = new Vector3(Random.Range(MinMaxCubeWidth.x, MinMaxCubeWidth.y), Random.Range(MinMaxCubeHeight.x, MinMaxCubeHeight.y), Random.Range(MinMaxCubeWidth.x, MinMaxCubeWidth.y));
                 Vector3 coords = RadialToCartesian(l, theta, radius, scale.y);

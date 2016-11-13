@@ -4,7 +4,13 @@ using System.Collections;
 public class MeshSpawner : MonoBehaviour {
 
     public int width;           //width and height of mesh to make  (make vector2 later for simplicity's sake)
-    public int height;
+    public int height;          //never mind vector 2 contains floats not ints
+
+    public bool GenerateFlat;
+
+    public float length;        //length of the cylinder
+    public float radius;        //radius of the cylinder
+    public int VertexSep;       //separation between vertices (i.e. resolution of the terrain)
 
     public float heightscale;   // perlin noise gives values [0,1], this multiplies to get a height
 
@@ -14,11 +20,23 @@ public class MeshSpawner : MonoBehaviour {
     private Mesh mesh;
     
     void Start () {
+        if (VertexSep < 1) VertexSep = 1;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        mesh.vertices = MakeVertices(width, height);
-        mesh.uv = MakeUVs(mesh.vertices,width,height);
-        mesh.triangles = MakeTriangles(mesh.vertices,width,height);
+        if (GenerateFlat)
+        {
+            mesh.vertices = MakeVertices(width, height);
+            mesh.uv = MakeUVs(mesh.vertices, width, height);
+            mesh.triangles = MakeTriangles(mesh.vertices, width, height);
+        }
+        else
+        {
+            mesh.vertices = MakeVerticesCylinder(length, radius, VertexSep);
+
+            mesh.triangles = MakeTrianglesCylinder(mesh.vertices, length, radius);
+            Debug.Log(mesh.vertices.Length);
+        }
+
         GetComponent<MeshCollider>().sharedMesh = mesh;
         mesh.RecalculateNormals();
 
@@ -44,6 +62,16 @@ public class MeshSpawner : MonoBehaviour {
 
                    */
 
+    void OnDrawGizmos()
+    {
+        if (mesh != null)
+        {
+            foreach (Vector3 v in mesh.vertices)
+            {
+                Gizmos.DrawIcon(v, "dot.png");
+            }
+        }
+    }
 
 
     Vector3[] MakeVertices(int width, int height)
@@ -54,10 +82,9 @@ public class MeshSpawner : MonoBehaviour {
             for(int j = 0; j < height; j++)
             {
                 float h = 0;
-                h = Mathf.PerlinNoise(NoiseOffset.x + (float)i / (float)width * NoiseScale, NoiseOffset.y + (float)j / (float)height * NoiseScale) * heightscale;
+                //h = Mathf.PerlinNoise(NoiseOffset.x + ((float)i / (float)width) * NoiseScale, NoiseOffset.y + ((float)j / (float)height) * NoiseScale) * heightscale;
+                h = PerlinOctaves(i, j);
                 list[i * height + j] = new Vector3(i, h, j);
-                //Debug.Log(h);
-                //Debug.Log(new Vector2((float)i / (float)width * (float)NoiseScale, (float)j / (float)height * (float)NoiseScale));
             }
         }
         return list;
@@ -110,5 +137,88 @@ public class MeshSpawner : MonoBehaviour {
         }
         return Triangles;
     }
+
+    //we don't need to read in the values as args here i think (?)
+    Vector3[] MakeVerticesCylinder(float length, float radius, float VertexSep)
+    {
+        int width = Mathf.CeilToInt(2*Mathf.PI*radius/VertexSep);   //wrong axis may cause something wonky, we'll see heh
+        int height = Mathf.CeilToInt(length / VertexSep);
+        Debug.Log(new Vector2(width, height));
+
+        Vector3[] list = new Vector3[width * height];
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                float h = 0;
+                h = PerlinOctaves(i, j);
+                list[i * height + j] = RadialToCartesian(j, i*360/width, radius, h);
+            }
+        }
+        return list;
+    }
+
+    int[] MakeTrianglesCylinder(Vector3[] verts, float length, float radius)
+    {
+        int width = Mathf.CeilToInt(2 * Mathf.PI * radius / VertexSep);   //wrong axis may cause something wonky, we'll see heh
+        int height = Mathf.CeilToInt(length / VertexSep);
+        int[] Triangles = new int[width * height * 2 * 3];
+        //for width*height number of points
+        //there will be (width-1)*(height-1) number of squares between those points
+        //each square is made up of 2 triangles
+        //each triangle is specified by 3 integers
+
+        int m = 0;
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height - 1; j++)
+            {
+                int i_ = i % (width - 1);
+                int ip_ = (i + 1) % (width - 1);
+
+                //for each square, make two triangles
+                //the top one
+                //    [(i,j),(i+1,j),(i+1,j+1)]
+                //    
+                Triangles[m++] = i * height + j;
+                Triangles[m++] = (i + 1) % (width) * height + (j + 1);
+                Triangles[m++] = (i + 1) % (width) * height + j;
+
+                //the bottom one
+                //    [(i,j),(i,j+1),(i+1,j+1)]
+                Triangles[m++] = i * height + j;
+                Triangles[m++] = i * height + (j + 1);
+                Triangles[m++] = (i + 1) % (width) * height + (j + 1);
+
+            }
+        }
+        return Triangles;
+    }
+
+
+
+    float PerlinOctaves(int x, int y)
+    {
+        //layering different scales of noise to produce large- and small-scale terrain (hills vs bumps)
+        float one = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale, NoiseOffset.y + ((float)y / (float)height) * NoiseScale) * heightscale;
+        float two = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale*2, NoiseOffset.y + ((float)y / (float)height) * NoiseScale*2) * heightscale*2;
+        float three = Mathf.PerlinNoise(NoiseOffset.x + ((float)x / (float)width) * NoiseScale*4, NoiseOffset.y + ((float)y / (float)height) * NoiseScale*4) * heightscale*4;
+        return one + two + three;
+    }
+
+                                     //z      //x          //radius     //y
+    public Vector3 RadialToCartesian(float l, float theta, float radius, float height)
+    {
+        //given a point within a cylinder
+        //gives you the xyz coords to put that point in world space
+        //assuming length is down X axis
+        Vector3 loc = new Vector3(0, 0, 0);
+        loc.x = l;
+        loc.y = Mathf.Cos(Mathf.Deg2Rad * theta) * (radius - height / 2);
+        loc.z = Mathf.Sin(Mathf.Deg2Rad * theta) * (radius - height / 2);
+
+        return loc;
+    }
+
 
 }
