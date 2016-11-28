@@ -17,6 +17,11 @@ public class MeshSpawner : MonoBehaviour {
     public float NoiseScale;    //multiplies to scale the noise; larger number is finer noise
     public Vector2 NoiseOffset; //randomize values to get different noisemaps; basically translates the noisemap presented to get different noise
 
+	[Range(0,1)]
+	public float persistance;
+	public float lacunarity;
+
+
     public float[] octaves;
 
     private Mesh mesh;
@@ -78,6 +83,20 @@ public class MeshSpawner : MonoBehaviour {
         - performance enhancements
             -generate it all in the same loop
 
+
+		PHASE 5
+
+		procedural clouds
+			basically have a smaller radius cylinder a distance above the surface
+				render it double-sided
+				
+				set the texture to a perlin-noise derived texture
+					if height less than n, set alpha to zero
+						else alpha rises linearly with height
+					increase offset with Time.time to animate it
+						for each octave, increase offset at different rates to make it look like clouds are forming and dispersing
+
+
                    */
 
     void OnDrawGizmos()
@@ -101,7 +120,7 @@ public class MeshSpawner : MonoBehaviour {
             {
                 float h = 0;
                 //h = Mathf.PerlinNoise(NoiseOffset.x + ((float)i / (float)width) * NoiseScale, NoiseOffset.y + ((float)j / (float)height) * NoiseScale) * heightscale;
-                h = PerlinOctaves(i, j);
+				h = PerlinOctavesNew(i, j);
                 list[i * height + j] = new Vector3(i, h, j);
             }
         }
@@ -242,6 +261,26 @@ public class MeshSpawner : MonoBehaviour {
         //Debug.Log(output);
         return output;
     }
+
+	//a new version based off the "procedural landmass" tutorial on youtube
+	float PerlinOctavesNew(int x, int y){
+		float amplitude = 1;
+		float frequency = 1F;
+		float output = 0;
+		float max = 0;
+		foreach(float m in octaves){
+			float sampleX = (x) / NoiseScale * frequency + NoiseOffset.x;
+			float sampleY = (y) / NoiseScale * frequency + NoiseOffset.y;
+			float perlin = Mathf.PerlinNoise (sampleX, sampleY) * 2 - 1;
+			output += perlin * amplitude;
+
+			max += amplitude;
+			amplitude *= persistance;
+			frequency *= lacunarity;
+		}
+		return output/max;
+	}
+
 
                                      //z      //x          //radius     //y
     public Vector3 RadialToCartesian(float l, float theta, float radius, float height)
