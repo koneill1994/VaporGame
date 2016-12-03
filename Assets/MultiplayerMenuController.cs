@@ -44,7 +44,7 @@ public class MultiplayerMenuController : MonoBehaviour {
         //create the server
 
         //set the seed
-        if (seed_input.text.Length > 0)
+        if (seed_input.text.Length > 0 && cubespawner!= null)
         {
             cubespawner.SetSeed(seed_input.text);
         }
