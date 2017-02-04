@@ -16,7 +16,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     public float pile_size = 10;
     public float VisionRange = 10;
 
-    private NavMeshAgent agent;
+    private UnityEngine.AI.NavMeshAgent agent;
     private bool IsHolding = false;
     private float base_speed;
 
@@ -27,7 +27,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     // Use this for initialization
     void Start () {
         CurrentGoal = StackerGoal.PickTargetObject;
-        agent = GetComponent<NavMeshAgent>();
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         base_speed = agent.speed;
     }
 
@@ -197,10 +197,10 @@ public class CubeStackingAIBehavior : MonoBehaviour {
         //don't run it every frame like a dumbass
         Transform bestTarget = null;
         float closestDistancePath = Mathf.Infinity;
-        NavMeshPath path = new NavMeshPath();
+        UnityEngine.AI.NavMeshPath path = new UnityEngine.AI.NavMeshPath();
         foreach (GameObject potential_target in objects)
         {
-            if (NavMesh.CalculatePath(transform.position, potential_target.transform.position, NavMesh.AllAreas, path))
+            if (UnityEngine.AI.NavMesh.CalculatePath(transform.position, potential_target.transform.position, UnityEngine.AI.NavMesh.AllAreas, path))
             {
                 float PathDistanceToTarget = PathLength(path);
                 Vector3 offset = potential_target.transform.position - pile.position;
@@ -220,7 +220,7 @@ public class CubeStackingAIBehavior : MonoBehaviour {
     }
 
 
-    float PathLength(NavMeshPath path)
+    float PathLength(UnityEngine.AI.NavMeshPath path)
     {
         //gives the length of a given NavMeshPath
         if (path.corners.Length < 2)

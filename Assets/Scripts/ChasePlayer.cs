@@ -5,13 +5,13 @@ using System.Collections;
 public class ChasePlayer : MonoBehaviour
 {
     public GameObject player;
-    private NavMeshAgent agent;
+    private UnityEngine.AI.NavMeshAgent agent;
     private float base_speed;
     public bool OnlyMoveWhenUnseen;
 
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         base_speed = agent.speed;    
     }
 

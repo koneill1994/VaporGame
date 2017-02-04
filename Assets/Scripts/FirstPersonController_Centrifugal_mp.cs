@@ -73,8 +73,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void Start()
         {
             m_Camera = transform.Find("FirstPersonCharacter").GetComponent<Camera>();
-
-            reference_frame = GameObject.Find("Inertial_Reference_Frame").transform;
+            if (GameObject.Find("Inertial_Reference_Frame") != null)
+            {
+                reference_frame = GameObject.Find("Inertial_Reference_Frame").transform;
+            }
+            else
+            {
+                reference_frame = null;
+            }
 
             //disable everyone's camera and audio listener
             //they will be enabled ONLY FOR THE CLIENT'S PLAYER MODEL below
