@@ -4,10 +4,10 @@ using UnityEngine.Networking;
 
 public class PickUp_mp : NetworkBehaviour
 {
-
+    public Camera cam;
     public int distanceToItem;
-    public GameObject player;
-    public GameObject hitObject;
+    //public GameObject player; // i don't think its used
+    private GameObject hitObject; //really only for debug purposes
     public Transform onhand;
     public Vector3 locale;
     public Vector3 objectVelocity;
@@ -54,11 +54,13 @@ public class PickUp_mp : NetworkBehaviour
 
         if (Input.GetButtonUp("Use") && !IsHolding)
         {
+            
             RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit, distanceToItem))
             {
+                //Debug.Log(hit.collider.gameObject.tag);
                 if (hit.collider.gameObject.tag == "CanPickUp")
                 {
                     hitObject = hit.collider.gameObject;
